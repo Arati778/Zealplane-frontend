@@ -1,0 +1,39 @@
+.notification-bell {
+  background-color: #f9f9f9; // Light background for the notification area
+  border: 1px solid #ddd; // Light border
+  border-radius: 8px; // Rounded corners
+  padding: 16px; // Padding around the content
+  max-width: 300px; // Maximum width for the bell
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+  position: relative; // Position relative for child elements
+
+  p {
+    color: #666; // Text color for loading and no notifications
+    font-size: 14px; // Font size
+    text-align: center; // Center align text
+  }
+
+  ul {
+    list-style: none; // Remove default list styling
+    padding: 0; // Remove padding
+    margin: 0; // Remove margin
+
+    li {
+      background-color: #fff; // White background for notifications
+      border: 1px solid #ddd; // Light border for each notification
+      border-radius: 4px; // Slightly rounded corners for notifications
+      padding: 10px; // Padding inside each notification
+      margin-bottom: 8px; // Space between notifications
+      transition: background-color 0.3s; // Smooth transition for hover effect
+
+      &:hover {
+        background-color: #f0f0f0; // Light gray background on hover
+      }
+
+      span {
+        color: #333; // Dark text for notification messages
+        font-size: 14px; // Font size for messages
+      }
+    }
+  }
+}

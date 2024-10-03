@@ -1,0 +1,116 @@
+.feedback {
+    // background-color: #1a1a1a; /* Dark background color */
+    color: #ccc; /* Light text color */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Increased shadow */
+    margin-bottom: 20px;
+  
+    .feedback-title {
+      font-size: 20px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: #fff; /* White title text color */
+    }
+  
+    .feedback-form {
+      margin-bottom: 20px;
+  
+      .feedback-input {
+        width: 70%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #333; /* Darker border */
+        border-radius: 4px;
+        resize: vertical;
+        background: #21272b;
+       
+        color: #ccc; /* Light text color */
+      }
+  
+      .feedback-button {
+        margin-top: 10px;
+        padding: 8px 16px;
+        font-size: 16px;
+        background-color: orangered;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+  
+        &:hover {
+          background-color: green;
+        }
+      }
+    }
+
+    .feedback-input, .feedback-item {
+      width: 100%; // Ensure full width within the parent container
+    }
+  
+    .feedback-list {
+      
+      .feedback-list-title {
+        font-size: 18px;
+        margin-top: 80px;
+        margin-bottom: 10px;
+        color: #fff; /* White title text color */
+      }
+  
+      .feedback-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color:#161a1f; /* Darker item background */
+        border: 1px solid #555; /* Darker border */
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly lighter shadow */
+        width: 70%;
+  
+        .feedback-info {
+          display: flex;
+          align-items: center;
+          margin-bottom: 8px;
+  
+          .feedback-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+          }
+  
+          .feedback-user {
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #fff; /* White user text color */
+          }
+  
+          .feedback-time {
+            font-size: 12px;
+            color: #999; /* Lighter time text color */
+          }
+        }
+  
+        .feedback-text {
+          font-size: 16px;
+          color: #ccc; /* Light text color */
+        }
+      }
+    }
+  }
+  .stars {
+    .star {
+      font-size: 24px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &.active {
+        color: #fdd835; // Yellow color for active stars
+      }
+
+      &:hover {
+        color: #fdd835;
+      }
+    }
+  }
+

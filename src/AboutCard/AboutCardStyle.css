@@ -1,0 +1,104 @@
+
+
+.head-top h1{
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 50px;
+    font-size: 2.25rem;
+    font-weight: 700; 
+    color: #fff;
+    font-family:"Segoe UI","Open Sans", "Helvetica Neue", sans-serif;
+}
+.head-top p{
+    font-family: 'Inter' ;
+    font-size: 20px;
+    color: rgb(207, 205, 198);
+    line-height: 26px;
+    letter-spacing: 1px;
+    text-align: start;
+    margin: 7px 80px;
+    margin-bottom: 30px;
+}
+
+.cardBox {
+    margin-left: 80px;
+    margin-right: 80px;
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    animation: 5s slide infinite linear;
+}
+
+.card1 {
+    position: relative;
+    margin: 5px 15px;
+  padding: 2.2rem;
+  border: 0.1px solid #1d325f;
+  box-shadow: 0 0 8px 3px rgba(46, 9, 54, 0.7), 0 0 65px 10px rgba(6, 25, 51, 0.5), 0 0 30px 7px rgba(5, 46, 33, 0.4);
+
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+    background: transparent;
+    border-radius: 15px;
+    border-radius: 0.375rem;
+    border-width: 1px; /* Equivalent to border in Tailwind CSS */
+  border-style: solid; /* Equivalent to border in Tailwind CSS */
+}
+
+.card1:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    background: linear-gradient(360deg, #041b26, #011124,#030628);
+}
+.card1 h1 {
+    margin-bottom: 0;
+    text-align: center;
+    /* color: wheat; */
+    color: rgb(236, 238, 239);
+    font-size: 1.6rem;
+  font-weight: 600; /* Equivalent to font-semibold */
+  line-height: 1; /* Equivalent to leading-none */
+  letter-spacing: -0.05em; 
+   
+}
+
+.card1 p {
+    text-align: center;
+    padding: 1rem;
+    margin: 0;
+    color: #ffffff; 
+    font-size: 0.975rem; 
+    line-height: 25px;
+    /* font-family: 'Lato', sans-serif;  */
+}
+
+@media screen and (max-width: 850px){
+
+    .head-top h1{
+       
+        font-size: 25px;
+    }
+    .head-top p{
+        font-size: 16px;
+        letter-spacing: 0px;
+        margin: 5px 20px 10px;
+    }
+    
+.cardBox{
+    flex-direction: column;
+    margin: 20px 10px;
+    gap: 5px;
+}
+.card1 h1{
+    font-size: 25px;
+}
+.card1 p{
+    font-size: 16px;
+}
+
+}
+.featureImage{
+    width: 200px;
+    margin-left: auto;
+  margin-right: auto;
+
+}

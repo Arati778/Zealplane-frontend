@@ -1,0 +1,464 @@
+@import "../../../mixins.scss";
+
+$netflix-red: #e50914; // Darker red for buttons
+$netflix-gray: #ddd; // Lighter gray for text
+$netflix-font-family: 'Helvetica Neue', sans-serif; // Consistent font
+
+.heroBanner {
+  width: 100%;
+  height: 450px;
+  background-color: var(--black);
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  @include md {
+    height: 700px;
+  }
+
+  .slideContent {
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    overflow: hidden; 
+    transition: filter 0.3s ease-in-out;
+
+    &:hover {
+      .imageWrapper {
+        filter: brightness(0.6); /* Apply brightness only to image */
+      }
+
+      .hoverContent {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .imageWrapper {
+      img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: filter 0.3s ease-in-out;
+      }
+    }
+
+    .hoverContent {
+      position: absolute ;
+      // bottom: 190px;
+      // left: 20px;
+
+      top: 0;
+      left: -40%;
+      width: 100%; /* 40% of the slider width */
+     
+      // background: linear-gradient(to right, rgba(0, 0, 0, 9), rgba(255, 255, 255, 0));
+      display: flex;
+      flex-direction: column;
+      // justify-content: center;
+      text-align: start;
+      align-items: start;
+      padding: 20px;
+      // transform: translateX(-100%);
+      // transition: transform 0.3s ease; /* Slide-in effect */
+
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 500;
+        color: #fff;
+        align-items: start;
+        max-width: 60%;
+      }
+    }
+
+.overlayImageBox:hover .hoverContent{
+  opacity: 1;
+}
+    .avatarContainer{
+      margin-top: 490px;
+      position: absolute;
+    }
+    .profileIcon {
+      position: absolute;
+      display: flex;
+      align-items: center;
+
+
+      img {
+        border-radius: 30%;
+        width: 35px;
+        height: 35px;
+        margin-right: 10px;
+      }
+
+      span {
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+       white-space: nowrap;
+      } 
+    }
+  }
+  .slideContent:hover .hoverContent {
+    transform: translateX(40%); /* Slide the hover content to its final position */
+  }
+
+  .swiper-wrapper{
+    margin-top: 0px;
+  }
+
+  .iconsContainer {
+    position: absolute;
+    margin-top: 480px;
+    right: -100px; /* Start off-screen to the right */
+   /* Smooth transition for sliding in */
+  
+    .icons {
+      display: flex;
+      gap: 10px;
+  
+      .icon {
+        color: #fff;
+        font-size: 24px; 
+        &:hover {
+          color: #e55209;
+
+        }
+      }
+    }
+  }.swiper-pagination-bullet {
+    display: none;
+  }
+  
+  .swiper-pagination-bullet:nth-child(-n+4) {
+    display: inline-block;
+  }
+  
+  
+  /* On hover, move the iconsContainer to the right corner */
+  .slideContent:hover .iconsContainer {
+    right: 20px; /* Position in the right corner */
+  }
+  
+ 
+
+  .backdrop-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+    overflow: hidden;
+    
+
+    .lazy-load-image-background {
+      width: 100%;
+      height: 100%;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        filter: blur(15px); // Add blur effect
+      }
+    }
+
+    // Adding the opacity layer at the bottom
+    .bottom-opacity-layer {
+      width: 100%;
+      height: 100px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    }
+  }
+
+  .opacity-layer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .iconSidebar {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 1;
+
+    .iconWrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background 0.3s ease;
+
+      .icon {
+        font-size: 24px;
+        color: #fff;
+        transition: transform 0.3s ease; // Add transition for smooth rotation
+      }
+
+      span {
+        color: #fff;
+        font-size: 0; // Start with font-size 0
+        opacity: 0; // Start with opacity 0
+        transition: opacity 0.3s ease, font-size 0.3s ease, margin-left 0.3s ease;
+        margin-left: 0; // Start with no margin
+      }
+
+      &:hover {
+        background: rgba(255, 2, 2, 0.9);
+        transform: translateX(15px);
+
+        .icon {
+          animation: rotate 0.3s ease; // Trigger rotation animation
+        }
+
+        span {
+          opacity: 1; // Make text visible
+          font-size: 14px; // Set text to its intended size
+          margin-left: 10px; // Optional: adds a sliding effect
+        }
+      }
+    }
+  }
+
+  // Define keyframes for the rotation animation
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .heroBannerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // Align content to the left
+    justify-content: flex-end; // Align content to the bottom
+    padding: 20px;
+    text-align: left;
+    position: absolute; // Changed from relative to absolute
+    bottom: 20px; // Position from the bottom
+    left: 20px; // Position from the left
+    max-width: 600px; // Reduced width to fit better with overlay
+    z-index: 2;
+
+    .Title {
+      font-size: 1.5rem; // Reduced size
+      font-weight: bold;
+      color: white;
+      @include md {
+        font-size: 2.5rem; // Adjusted for larger screens
+      }
+    }
+
+    .description {
+      margin-bottom: 20px;
+      color: $netflix-gray;
+      font-family: $netflix-font-family;
+      font-size: 1rem; // Reduced size
+      font-weight: bold;
+      @include md {
+        font-size: 1.2rem; // Adjusted for larger screens
+      }
+    }
+
+    .buttonGroup {
+      display: flex;
+      gap: 10px; // Reduced gap
+      margin: 10px 0;
+
+      .likeButton, .enquireButton {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px; // Reduced padding
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-family: $netflix-font-family;
+        font-size: 1rem; // Reduced size
+        cursor: pointer;
+        transition: background 0.3s ease;
+
+        svg {
+          margin-right: 5px;
+          fill: white;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.9);
+        }
+      }
+    }
+  }
+}
+
+.overlayImageBox {
+  position: relative;
+  top: 44%;
+  left: 50%;
+  width: 1050px; // Adjusted width
+  height: 550px; // Adjusted height
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+
+  &:hover .sidebar {
+    left: 0;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+    }
+
+  
+// swiper css
+
+/* Swiper CSS customization */
+.swiper {
+ 
+  height: 100%;
+
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .swiper-slide img {
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  .swiper-pagination-bullet {
+    background: #fff;
+    opacity: 1;
+  }
+
+  .swiper-pagination-bullet-active {
+    background: #ff0000;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    color: #fff;
+  }
+
+  .swiper-button-prev:hover,
+  .swiper-button-next:hover {
+    color: #ff0000;
+  }
+}
+
+.swiper-container {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 10px; /* Adjust this value to position the dots within the viewport */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+.swiper-pagination-bullet {
+  background: #fff;
+  opacity: 1;
+}
+.swiper-pagination-bullet-active {
+  background: #ff0000;
+}
+
+/* style.scss */
+
+.shareModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8); /* Dark background with opacity */
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.shareOptions {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+.shareOptions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 15px;
+}

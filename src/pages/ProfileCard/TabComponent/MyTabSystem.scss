@@ -1,0 +1,32 @@
+.tab-system {
+    width: 100%;
+  }
+  
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #21b104;
+  }
+  
+  .custom-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    border-bottom: none;
+    margin-right: 2px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .custom-tab.active {
+    background-color: #00aeef;
+    color: #fff;
+    border-bottom: 1px solid #00aeef;
+  }
+  
+  .tab-contents {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+  }
+  

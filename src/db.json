@@ -1,0 +1,64 @@
+{
+  "projects": [
+    {
+      "projectId": 1,
+      "projectName": "E-commerce website",
+      "projectTitle": "this is a CrazyShop",
+      "projectImageLink": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fnicepage.com%2Ffeatures%2Fc%2Fe-commerce&psig=AOvVaw3eMmq129aeMGWepbIrsVaH&ust=1719710523196000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKCs9sHT_4YDFQAAAAAdAAAAABAE",
+      "projectDescription": "Ecommerce website design involves creating and launching a virtual store to sell products. We're not talking about listing your items on a third-party online",
+      "projectType": "E-commerce",
+      "projectVideoLink": "https://youtu.be/s__m4cqlEzc",
+      "approved":29,
+      "feedback":13,
+      "enquired":6
+    },
+    {
+      "projectId": 2,
+      "projectName": "front-end development",
+      "projectTitle": "fitness website",
+      "projectImageLink": "https://ethicsinfotech.in/uploads/slider/e-commerce-website.png",
+      "projectDescription": "Ecommerce website design involves creating and launching a virtual store to sell products. We're not talking about listing your items on a third-party online",
+      "projectType": "website",
+      "projectVideoLink": "https://youtu.be/gcgpaaFsnjg",
+      "approved":20,
+      "feedback":13,
+      "enquired":3
+    },
+    {
+      "projectId": 3,
+      "projectName": "Food",
+      "projectTitle": "Kababi musafir",
+      "projectImageLink": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfS_8mhj5GBrKKS6YGd7ZYAL8uVT10hKIdEQ&usqp=CAU",
+      "projectDescription": "Food vlogging refers to the practice of creating and sharing videos on social media platforms that focus on food-related content. Popular food vloggers use various speech acts and modalities to describe food",
+      "projectType": "Food vlog",
+      "projectVideoLink": "https://youtu.be/fIrSgil8jVI",
+      "approved":45,
+      "feedback":13,
+      "enquired":11
+    },
+    {
+      "projectId": 4,
+      "projectName": "full stack",
+      "projectTitle": "Travel website",
+      "projectImageLink": "https://trip-villa.vercel.app/",
+      "projectDescription": "Established in 1998, Trippz began as a dream to redefine travel. Over the years, we've evolved into a trusted name, curating unforgettable journeys and fostering lasting connections worldwide",
+      "projectType": "full stack development",
+      "projectVideoLink": "https://youtu.be/0dOSLhPzSGI",
+      "approved":56,
+      "feedback":13,
+      "enquired":16
+    },
+    {
+      "projectId": 5,
+      "projectName": "full stack",
+      "projectTitle": "portfolio website",
+      "projectImageLink": "https://portfoli-ap.netlify.app/",
+      "projectDescription": "Web developer skills are often applied to the non-design aspects of building websites – writing markup and coding. Web developers may also use content management systems (CMS) to make content changes easier for other developers or end-users who may lack technical skills.",
+      "projectType": "full stack website",
+      "projectVideoLink": "https://youtu.be/jhCDW8Bnesg?list=PL0JfpSrXxTMyybivS1O2RPQw6V173EaWT",
+      "approved":11,
+      "feedback":13,
+      "enquired":8
+    }
+  ]
+}

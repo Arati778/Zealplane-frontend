@@ -1,0 +1,24 @@
+.radar-chart-container {
+    width: 280px;  // Adjust size of radar chart container
+    height: 280px;
+    // background-color: #1b1d1f;  // Dark background like in DOTA
+    padding: 20px;
+    border-radius: 10px;  // Slightly rounded edges for a modern look
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    canvas {
+      background: none;  // Ensure the radar chart background remains transparent
+      border: 1px solid rgba(199, 55, 19, 0.1);  // Add subtle border to radar chart
+      box-shadow: 0 0 15px rgba(255, 42, 0, 0.3);  // DOTA-style glowing effect
+      border-radius: 10px;
+    }
+  }
+  
+  // Additional SCSS for DOTA-inspired fonts and effects
+  .radar-chart-container text {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;  // White text inside the chart
+  }
+  

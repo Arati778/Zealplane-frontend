@@ -1,0 +1,160 @@
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--black);
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    height: 650px;
+    overflow: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    .circleRating {
+        width: 40px;
+        height: 40px;
+        position: relative;
+        top: -45px;
+        left: 35px;
+        background-color: white;
+        flex-shrink: 0;
+    }
+
+    &.open {
+        display: block;
+    }
+
+    &.closed {
+        display: none;
+    }
+
+    img {
+        width: 400px;
+        height: 450px;
+        margin-left: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: white;
+    }
+
+    .date {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .genres {
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+        padding: 10px;
+    }
+}
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  
+    button {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      border: none;
+      background-color: transparent;
+      color: white;
+      cursor: pointer;
+  
+      svg {
+        margin-right: 8px;
+        font-size: 20px;
+      }
+  
+      &:hover {
+        text-decoration: underline;
+      }
+  
+      &.likeButton {
+        color: #f44336; // Red color
+      }
+  
+      &.enquireButton {
+        color: #2196f3; // Blue color
+      }
+  
+      &.shareButton {
+        color: #4caf50; // Green color
+      }
+  
+      &.wishlistButton {
+        color: #ff9800; // Orange color
+      }
+    }
+  }
+  .posterBlock {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+        .playbtn {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    top: 50%;
+    left: 50%;
+
+    cursor: pointer;
+    svg {
+        width: 60px;
+    }
+    .text {
+        font-size: 20px;
+        transition: all 0.7s ease-in-out;
+    }
+    .triangle {
+        stroke-dasharray: 240;
+        stroke-dashoffset: 480;
+        stroke: white;
+        transform: translateY(0);
+        transition: all 0.7s ease-in-out;
+    }
+    .circle {
+        stroke: white;
+        stroke-dasharray: 650;
+        stroke-dashoffset: 1300;
+        transition: all 0.5s ease-in-out;
+    }
+    &:hover {
+        .text {
+            color: var(--pink);
+        }
+        .triangle {
+            stroke-dashoffset: 0;
+            opacity: 1;
+            stroke: var(--pink);
+            animation: trailorPlay 0.7s ease-in-out;
+        }
+        .circle {
+            stroke-dashoffset: 0;
+            stroke: var(--pink);
+        }
+    }
+}
+  }
+  .goToPageButton {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,16 @@
+.fade-text-container {
+    position: relative;
+    max-height: 150px; // Limit the height for the fade effect
+    overflow: hidden;
+  
+    .fade-text {
+      position: relative;
+      padding: 10px;
+      line-height: 1.5;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0.1));
+      -webkit-mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0));
+      mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0));
+      transition: all 0.3s ease;
+    }
+  }
+  
