@@ -1,3 +1,94 @@
+.backa-comic-main {
+    display: flex;
+    justify-content: space-between; /* Maintain space between sections */
+}
+
+.left-banka, .right-banka {
+    width: 50%; /* Equal width for both sections */
+    padding: 15px; /* Padding for spacing */
+    box-sizing: border-box; /* Ensure padding doesn’t increase width */
+    position: relative; /* Needed for pseudo-elements */
+}
+
+
+.left-banka {
+    border-right: 1px solid #1d325f; /* Vertical line */
+      opacity: 0; /* Start hidden */
+    transition: opacity 0.5s ease-in-out; /* Smooth transition for opacity */
+}
+
+/* Style for the star icon below the line */
+.left-banka::before {
+    content: "★"; /* Star icon */
+    font-size: 24px; /* Size of the star */
+    color: #1d325f; /* Color of the star */
+    position: absolute;
+    bottom: -30px; /* Position below the line */
+    right: -15px; /* Align star with the line */
+}
+
+/* Style for the vertical line with box shadow */
+.left-banka::after {
+    content: "";
+    position: absolute;
+    top: 0; /* Align at the top */
+    right: -10px; /* Space from content */
+    height: 100%; /* Full height */
+    width: 2px; /* Line thickness */
+    background-color: #1d325f; /* Line color */
+    box-shadow: 0 0 8px 3px rgba(46, 9, 54, 0.7), 
+                0 0 65px 10px rgba(6, 25, 51, 0.5), 
+                0 0 30px 7px rgba(5, 46, 33, 0.4); /* Box shadow */
+}
+
+.backa-image {
+    text-align: center;
+    margin-top: 50px; /* Space above the image */
+}
+
+.right-banka {
+    position: relative; /* Needed for absolute positioning of background highlights */
+}
+.left-banka {
+    opacity: 0; /* Start hidden */
+    animation: fadeIn 1s forwards; /* Fade in for the entire container */
+}
+
+.adventure-text {
+    opacity: 0; /* Start hidden */
+    animation: slideIn 1s forwards 0.5s; /* Delay for 0.5s */
+}
+
+.demon-slayer-title {
+    opacity: 0; /* Start hidden */
+    animation: fadeInUp 1s forwards 1.5s; /* Delay for 1.5s */
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1; /* Fully visible */
+    }
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1; /* Fully visible */
+        transform: translateY(0); /* No vertical movement */
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0; /* Start hidden */
+        transform: translateY(20px); /* Start 20px lower */
+    }
+    100% {
+        opacity: 1; /* Fully visible */
+        transform: translateY(0); /* Move to original position */
+    }
+}
+
+
 
 
 .head-top h1{
@@ -11,7 +102,7 @@
 }
 .head-top p{
     font-family: 'Inter' ;
-    font-size: 20px;
+    font-size: 18px;
     color: rgb(207, 205, 198);
     line-height: 26px;
     letter-spacing: 1px;

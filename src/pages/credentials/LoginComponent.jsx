@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUserId } from "../../store/userAction";
@@ -33,17 +33,21 @@ export default function LoginComponent() {
 
       console.log("Response Data after logging in:", response.data);
       const userId = response.data.id;
-      const username = response.data.userDescription;
+      const username = response.data.username;
       const token = response.data.token;
 
       localStorage.setItem("Id", userId);
-      localStorage.setItem("userId", username);
+      localStorage.setItem("username", username);
       localStorage.setItem("token", token);
       console.log("token saved are:", token);
       const id = localStorage.getItem("Id");
       console.log(
         "UserId stored in localStorage:",
-        localStorage.getItem("userId")
+        localStorage.getItem("Id")
+      );
+      console.log(
+        "Username stored in localStorage:",
+        localStorage.getItem("username")
       );
       dispatch(setUserId(userId));
       navigate("/home");
@@ -63,6 +67,7 @@ export default function LoginComponent() {
 
   return (
     <div className="login-wrapper">
+    <ToastContainer/>
       <div className="login-wrapper-inner">
         <h1 className="heading">Sign in</h1>
         <p className="sub-heading">Stay updated on your professional world</p>

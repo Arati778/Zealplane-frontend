@@ -10,14 +10,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #272729; /* Darker background for the header */
+  // background-color: #272729;
+  background-color: #1a1a1b;
   padding: 10px 20px;
   border-bottom: 1px solid #343536; /* Slight border for separation */
+  
+  /* Logo Styling */
+  
+  .header-logo {
+    display: flex;
+    align-items: center;
 
-  .header-logo img {
-    width: 100px;
+    img {
+      width: 45px; /* Adjust the logo width */
+      height: auto; /* Ensure height is automatically adjusted */
+    }
   }
 
+  /* Navigation Links */
   .header-nav {
     display: flex;
     gap: 20px;
@@ -26,18 +36,30 @@ body {
       text-decoration: none;
       color: #d7dadc; /* Light text color for links */
       font-weight: bold;
+    
+      border: 1px solid rgb(69, 68, 68);
+      padding: 5px 16px;
+      border-radius: 15px;
+
       &:hover {
+        background: #343536;
         color: #0079d3; /* Blue on hover */
       }
     }
   }
 
+  /* Search Bar */
   .header-search {
     display: flex;
     align-items: center;
     background-color: #343536; /* Darker search bar background */
     padding: 5px 10px;
-    border-radius: 4px;
+    border-radius: 17px;
+    width: 100%; /* Makes the search bar responsive */
+    max-width: 500px; /* Sets a maximum width to prevent it from becoming too large on larger screens */
+    margin: 1px 55px;
+
+
 
     input {
       border: none;
@@ -46,10 +68,14 @@ body {
       margin-left: 5px;
       font-size: 14px;
       outline: none;
-      width: 250px;
+      width: 350px;
+      padding: 4px 5px;
+      
     }
+    
   }
-
+  
+  /* Icon Links */
   .header-icons {
     display: flex;
     align-items: center;
@@ -57,10 +83,19 @@ body {
 
     .icon-link {
       color: #d7dadc; /* White/light icons */
-      font-size: 27px;
+      font-size: 27px; /* Adjust icon size */
+
       &:hover {
         color: #0079d3; /* Blue on hover for icons */
       }
+    }
+
+    /* Profile Picture */
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%; /* Circular profile picture */
+      object-fit: cover; /* Ensure the image doesn't stretch */
     }
   }
 }
@@ -78,6 +113,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 40px;
 }
 
 .page-title {
@@ -89,7 +125,7 @@ body {
 
 .post-list {
   width: 100%;
-  max-width: 640px;
+  max-width: 690px;
   margin: 0 auto;
   padding: 10px;
   background-color: #272729; /* Dark background for post container */
@@ -211,4 +247,59 @@ body {
 
 .comments-link:hover {
   text-decoration: underline;
+}
+.profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.header-icons .icon-link {
+  margin-left: 10px;
+}
+.header-icons .icon-link {
+  position: relative;
+  display: inline-block;
+  margin: 0 10px;
+  cursor: pointer;
+
+  /* Tooltip styling */
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%; /* Position the tooltip above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  &:hover::after {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@media(max-width: 900px){
+  .nav-link{
+    font-size: 16px;
+  }
+  .header-search{
+    max-width: 200px;
+    margin: 1px 20px;
+    padding: 10px;
+    input{
+      width: 200px;
+    }
+  }
+  
 }

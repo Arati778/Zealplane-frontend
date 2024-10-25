@@ -9,8 +9,7 @@ import "./avatar.scss";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-
+import { colors } from "@mui/material";
 
 Modal.setAppElement("#root");
 
@@ -25,12 +24,15 @@ const ProfileCard = () => {
     username: "Krishna",
     jobRole: "FullStack Developer",
     description: "This is demo description",
+    location: "",
     fullName: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
+    fullname: data.fullname,
     jobRole: data.jobRole,
     description: data.description,
+    location: data.location,
   });
   const { id } = useParams();
 
@@ -38,7 +40,6 @@ const ProfileCard = () => {
   const isOwner = id === userId;
   // console.log("userId", userId);
   // console.log("id", id);
-  
 
   useEffect(() => {
     // Fetch user data from backend API
@@ -46,18 +47,23 @@ const ProfileCard = () => {
       try {
         // Use 'id' from URL if present; otherwise, use 'userId'
         const userIdToFetch = id || userId;
-        const response = await axios.get(`${apiBaseUrl}/users/${userIdToFetch}`);
+        const response = await axios.get(
+          `${apiBaseUrl}/users/${userIdToFetch}`
+        );
         console.log("User data is:", response.data);
-        const { fullName, description, jobRole } = response.data;
+        const { fullName, description, jobRole, location } = response.data;
         setData((prevData) => ({
           ...prevData,
-          fullName: fullName || "Full Name not provided",
-          description: description || "Description not provided",
-          jobRole: jobRole || "Job Role not provided",
+          fullName: fullName || "Enter Your Name",
+          description: description || "Enter Your Description",
+          jobRole: jobRole || "Enter Job Role",
+          location: location || "Your location",
         }));
         setFormData({
-          jobRole: jobRole || "Job Role not provided",
-          description: description || "Description not provided",
+          fullname: fullName || "",
+          jobRole: jobRole || "",
+          location: location || "",
+          description: description || "",
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -83,7 +89,7 @@ const ProfileCard = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ 
+    setFormData({
       ...formData,
       [name]: value,
     });
@@ -91,24 +97,25 @@ const ProfileCard = () => {
 
   const handleSaveButtonClick = async () => {
     try {
-      const response = await axios.put(
-        `${apiBaseUrl}/users/${userId}`,
-        {
-          jobRole: formData.jobRole,
-          description: formData.description,
-        }
-      );
+      const response = await axios.put(`${apiBaseUrl}/users/${userId}`, {
+        fullName: formData.fullname,
+        jobRole: formData.jobRole,
+        location: formData.location,
+        description: formData.description,
+      });
       console.log("User data updated:", response.data);
       toast.success("Your description updated succesfully!");
       setData({
         ...data,
+        fullName: formData.fullname,
         jobRole: formData.jobRole,
+        location: formData.location,
         description: formData.description,
       });
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating user data:", error);
-      toast.error("description update failed! please try again")
+      toast.error("description update failed! please try again");
     }
   };
 
@@ -119,14 +126,14 @@ const ProfileCard = () => {
       backgroundColor: "rgba(0, 0, 0, 0.4)",
     },
     content: {
-      top: "50%",
+      top: "53%",
       left: "50%",
       right: "auto",
       bottom: "auto",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%",
-      height: "70%",
+      height: "85%",
       backgroundColor: "white",
       color: "black",
       padding: "20px",
@@ -145,10 +152,10 @@ const ProfileCard = () => {
   window.addEventListener("resize", responsiveStyles);
 
   return (
-    <div className="col mb-3" style={{ marginTop: "30px" }}>
-    <ToastContainer/>
+    <div className="col mb-3" style={{ marginTop: "10px" }}>
+      <ToastContainer />
       <div>
-      <div
+        <div
           className="card"
           style={{
             background: "transparent",
@@ -156,7 +163,7 @@ const ProfileCard = () => {
             marginLeft: "10px",
             width: "100%",
             overflow: "auto",
-            maxHeight: "250px",
+            maxHeight: "270px",
           }}
         >
           {/* Conditionally render the Edit button */}
@@ -165,19 +172,26 @@ const ProfileCard = () => {
               <FaEdit />
             </Button>
           )}
-          <h5>
-            <strong>Artist</strong> // <strong>Writer</strong> //{" "}
-            <strong>FullStack Developer</strong> // {data.jobRole}
+          <h4>{data.fullName}</h4>
+          <h5 style={{ color: "#34aadc" }}>
+            {/* <strong>Artist</strong> // <strong>Writer</strong> //{" "} */}
+            {data.jobRole}
+            {/* <strong>Enter Your Profile</strong> //  */}
           </h5>
+
+          <h7 style={{ color: "#ced4da" }}>{data.location}</h7>
           <br />
-          <h6>About Me</h6>
+          <h5 style={{ fontWeight: "200" }}>About</h5>
           <div className="fade-text-container">
-        <span>
-          <p className="fade-text" style={{ color: "white" }}>
-            {data.description}
-          </p>
-        </span>
-      </div>
+            <span>
+              <p
+                className="fade-text"
+                style={{ color: "white", marginBottom: "1px" }}
+              >
+                {data.description}
+              </p>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -190,7 +204,7 @@ const ProfileCard = () => {
         <span
           onClick={handleCancelClick}
           style={{
-            fontSize: "20px",
+            fontSize: "1px",
             cursor: "pointer",
             color: "rgb(39, 39, 39)",
             display: "flex",
@@ -200,6 +214,18 @@ const ProfileCard = () => {
           <FaTimes />
         </span>
         <div className="card-input-container">
+          <h5 className="pt-sm-2 pb-1 mb-0 mt-3 text-nowrap">
+            Enter Your Full Name
+          </h5>
+          <input
+            type="text"
+            name="fullname"
+            value={formData.fullname}
+            placeholder="Your Full Name"
+            onChange={handleInputChange}
+            style={{ marginBottom: "5px", width: "100%", fontSize: "18px" }}
+          />
+          <br />
           <h5>What's Your Passion</h5>
           <input
             type="text"
@@ -207,7 +233,17 @@ const ProfileCard = () => {
             value={formData.jobRole}
             placeholder="Writer / Artist / Developer / Designer"
             onChange={handleInputChange}
-            style={{ marginBottom: "10px", width: "100%" }}
+            style={{ marginBottom: "5px", width: "100%" }}
+          />
+          <br />
+          <h5>Location</h5>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            placeholder="Your Location"
+            onChange={handleInputChange}
+            style={{ marginBottom: "5px", width: "100%" }}
           />
           <br />
           <h5>Description</h5>
@@ -217,9 +253,10 @@ const ProfileCard = () => {
             value={formData.description}
             placeholder="About You"
             onChange={handleInputChange}
-            style={{ marginBottom: "10px", width: "100%" }}
+            style={{ marginBottom: "5px", width: "100%" }}
           />
           <br />
+
           <h5>Your birth date?</h5>
           <input
             type="text"
@@ -227,7 +264,7 @@ const ProfileCard = () => {
             value={formData.dob}
             placeholder="About Your date of birth"
             onChange={handleInputChange}
-            style={{ marginBottom: "10px", width: "100%" }}
+            style={{ marginBottom: "5px", width: "100%" }}
           />
           <span>
             <Button

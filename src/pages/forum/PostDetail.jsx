@@ -2,79 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './postdetail.scss';
-import { BiUpvote, BiDownvote } from "react-icons/bi";
-import { FaRegCommentAlt } from "react-icons/fa";
-import { RiShareForwardLine } from "react-icons/ri";
+import Header from './Component/Header';
+import PostInfo from './Component/Posts/PostInfo';
+import PostInteractions from './Component/Posts/PostInteract';
+import CommentsSection from './Component/Posts/CommentsSection';
 
 const PostDetail = () => {
   const { id } = useParams(); // Get the post ID from the URL
   const [post, setPost] = useState(null); // State to store the post data
-  const [newComment, setNewComment] = useState(''); // State for the new comment
   const [comments, setComments] = useState([]); // State to store comments
   const [userVote, setUserVote] = useState(null); // Track if user upvoted or downvoted
   const [isVoting, setIsVoting] = useState(false); // Prevent multiple votes
+
+  const token = localStorage.getItem('token'); // Retrieve the token from local storage
 
   // Fetch the post data from the backend when the component mounts
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/posts/${id}`);
-        console.log("fetched the data for subreditt is:", response.data);
+        const response = await axios.get(`http://localhost:5000/api/posts/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request
+          },
+        });
         
         setPost(response.data);
         setComments(response.data.comments); // Initialize comments state
+        setUserVote(response.data.userVote); // Set initial vote state
       } catch (error) {
         console.error('Error fetching post:', error);
       }
     };
 
     fetchPost();
-  }, [id]);
+  }, [id, token]);
 
-  // Handle new comment input change
-  const handleCommentChange = (event) => {
-    setNewComment(event.target.value);
-  };
-
-  // Handle new comment submission
-  const handleCommentSubmit = async (event) => {
-    event.preventDefault(); // Prevent form default behavior
-    try {
-      const response = await axios.post(`http://localhost:5000/api/posts/${id}/comments`, {
-        body: newComment
-      });
-      setComments([...comments, response.data]); // Add new comment to the comments list
-      setNewComment(''); // Clear the input field
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-    }
-  };
-
-  // Handle upvote
-  const handleUpvote = async () => {
-    if (isVoting || userVote === 'upvote') return; // Prevent multiple votes
+  // Handle voting logic (pass down to PostInteractions)
+  const handleVote = async (voteType) => {
+    if (isVoting) return; // Prevent multiple votes
     setIsVoting(true);
-    try {
-      await axios.put(`http://localhost:5000/api/posts/${id}/votes`, { vote: 1 });
-      setUserVote('upvote');
-      setPost((prevPost) => ({ ...prevPost, votes: prevPost.votes + (userVote === 'downvote' ? 2 : 1) }));
-    } catch (error) {
-      console.error('Error upvoting post:', error);
-    } finally {
-      setIsVoting(false);
-    }
-  };
 
-  // Handle downvote
-  const handleDownvote = async () => {
-    if (isVoting || userVote === 'downvote') return; // Prevent multiple votes
-    setIsVoting(true);
     try {
-      await axios.post(`http://localhost:5000/api/posts/${id}/downvote`, { vote: -1 });
-      setUserVote('downvote');
-      setPost((prevPost) => ({ ...prevPost, votes: prevPost.votes - (userVote === 'upvote' ? 2 : 1) }));
+      let updatedVotes = post.votes;
+      const isUpvote = voteType === 'upvote';
+      const isDownvote = voteType === 'downvote';
+
+      if (userVote === (isUpvote ? 'upvote' : 'downvote')) {
+        // Undo vote
+        await axios.put(`http://localhost:5000/api/posts/votes/${id}`, { vote: isUpvote ? -1 : 1 }, { headers: { Authorization: `Bearer ${token}` }});
+        updatedVotes += isUpvote ? -1 : 1;
+        setUserVote(null); // Reset user vote
+      } else {
+        // New or changing vote
+        await axios.put(`http://localhost:5000/api/posts/votes/${id}`, { vote: isUpvote ? 1 : -1 }, { headers: { Authorization: `Bearer ${token}` }});
+        updatedVotes += isUpvote ? 1 : -1;
+        setUserVote(isUpvote ? 'upvote' : 'downvote'); // Set user vote
+      }
+
+      setPost((prevPost) => ({ ...prevPost, votes: updatedVotes }));
     } catch (error) {
-      console.error('Error downvoting post:', error);
+      console.error('Error voting on post:', error);
     } finally {
       setIsVoting(false);
     }
@@ -83,58 +70,29 @@ const PostDetail = () => {
   if (!post) return <div>Loading...</div>; // Show loading state while data is being fetched
 
   return (
-    <div className="post-detail-container">
-      <div className="post-header">
-        <h2 className="post-title">{post.title}</h2>
-        <div className="post-meta">
-          <span className="subreddit">r/{post.subreddit}</span> • 
-          <span className="author">Posted by u/{post.author}</span> • 
-          <span className="timestamp">{post.timestamp}</span>
-        </div>
-      </div>
-      
-      <div className="post-body">
-        <p>{post.body}</p>
-      </div>
+    <div className="post">
+      <Header />
 
-      <div className="post-votes">
-        <button
-          className={`vote-button upvote ${userVote === 'upvote' ? 'active' : ''}`}
-          onClick={handleUpvote}
-          disabled={isVoting || userVote === 'upvote'}
-        >
-          <BiUpvote />
-        </button>
-        <span className="vote-count">{post.votes}</span>
-        <button
-          className={`vote-button downvote ${userVote === 'downvote' ? 'active' : ''}`}
-          onClick={handleDownvote}
-          disabled={isVoting || userVote === 'downvote'}
-        >
-          <BiDownvote />
-        </button>
-        <button className="vote-button comment"><FaRegCommentAlt /></button>
-        <button className="vote-button share"><RiShareForwardLine /></button>
-      </div>
+      <div className="post-detail-container">
+        {/* Post Information Component */}
+        <PostInfo post={post} />
 
-      <div className="post-comments">
-        <h3>Comments</h3>
-        {comments.map((comment) => (
-          <div key={comment.id} className="comment">
-            <p>{comment.body}</p>
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleCommentSubmit} className="comment-form">
-        <textarea
-          value={newComment}
-          onChange={handleCommentChange}
-          placeholder="Add a comment..."
-          required
+        {/* Post Interactions (voting, comment, share) */}
+        <PostInteractions 
+          post={post} 
+          userVote={userVote} 
+          handleVote={handleVote} 
+          isVoting={isVoting} 
+          commentCount={comments.length}
         />
-        <button type="submit" className="submit-button">Submit</button>
-      </form>
+
+        {/* Comments Section (list + form) */}
+        <CommentsSection
+          comments={comments}
+          setComments={setComments}
+          postId={id}
+        />
+      </div>
     </div>
   );
 };

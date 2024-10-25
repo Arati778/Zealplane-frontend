@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import "./RegisterComponent.scss";
 import "/src/AboutCard/ModelStyle.css";
@@ -18,6 +18,15 @@ export default function RegisterComponent({ showModal, handleClose }) {
 
   const register = async () => {
     try {
+      if (
+        !credentials.username ||
+        !credentials.email ||
+        !credentials.password ||
+        !confirmPassword
+      ) {
+        toast.error("All fields are required");
+        return;
+      }
       if (credentials.username.includes(" ")) {
         toast.error("Username cannot contain spaces");
         return;
@@ -37,6 +46,7 @@ export default function RegisterComponent({ showModal, handleClose }) {
         credentials
       );
       console.log("Response from backend:", response.data);
+      toast.success("Successfully registered");
 
       // Navigate to the login page
       navigate("/login");
@@ -46,6 +56,7 @@ export default function RegisterComponent({ showModal, handleClose }) {
       toast.error("Cannot Create your Account");
     }
   };
+
   const handleGoogleRegister = async (credentialResponse) => {
     try {
       // Extract the Google token from the response
@@ -54,12 +65,14 @@ export default function RegisterComponent({ showModal, handleClose }) {
       console.log("Google Token:", googleToken);
       // Send the Google token to your backend
       const response = await axios.post(
-        `${import.meta.env.VITE_PUBLIC_API}/users/google-login`,
+        `${import.meta.env.VITE_PUBLIC_API}/api/users/google-login`,
         { token: googleToken }
       );
 
       // Save user data to Redux or handle as needed
       dispatch(setUser(response.data.user));
+
+      // localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Redirect to the home page
       navigate("/home");
@@ -71,6 +84,7 @@ export default function RegisterComponent({ showModal, handleClose }) {
 
   return (
     <div className="login-wrapper">
+      <ToastContainer />
       <div className="login-wrapper-inner">
         <h1 className="heading">Make the most of your professional life</h1>
         <div className="auth-inputs">
@@ -126,20 +140,20 @@ export default function RegisterComponent({ showModal, handleClose }) {
           </p>
         </div>
         <div>
-              <GoogleLogin
-                clientId="120764277175-k72vhgov1mabn0sr3073oh4ck9v43mgk.apps.googleusercontent.com"
-                onSuccess={handleGoogleRegister}
-                onError={() => toast.error("Google Sign-in failed")}
-                render={(renderProps) => (
-                  <button
-                    onClick={renderProps.onClick}
-                    disabled={renderProps.disabled}
-                    className="google-btn"
-                  >
-                    <img src={glogo} alt="Google logo" className="google-logo" />
-                  </button>
-                )}
-              />
+          <GoogleLogin
+            clientId="120764277175-k72vhgov1mabn0sr3073oh4ck9v43mgk.apps.googleusercontent.com"
+            onSuccess={handleGoogleRegister}
+            onError={() => toast.error("Google Sign-in failed")}
+            render={(renderProps) => (
+              <button
+                onClick={renderProps.onClick}
+                disabled={renderProps.disabled}
+                className="google-btn"
+              >
+                <img src={glogo} alt="Google logo" className="google-logo" />
+              </button>
+            )}
+          />
         </div>
       </div>
     </div>

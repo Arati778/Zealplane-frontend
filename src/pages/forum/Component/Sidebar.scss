@@ -1,60 +1,92 @@
 .sidebar {
-    width: 240px;
-    background-color: #f9f9f9;
-    padding: 15px;
-    position: fixed;
-    height: 100vh;
-    border-right: 1px solid #e3e3e3;
-  
-    .sidebar-section {
+  width: 240px;
+  background-color: #1a1a1b;
+  padding: 15px;
+  position: fixed;
+  left: 0;
+  margin-top: 55px;
+  height: 100vh;
+  border-right: 1px solid #444; 
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(0);
+
+  .sidebar-section {
       margin-bottom: 20px;
-  
+
       h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-        color: #333;
+          font-size: 16px;
+          margin-bottom: 10px;
+          color: #ffffff; // White color for section headers
       }
-  
+
       .sidebar-header {
-        display: flex;
-        align-items: center;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-  
-        .icon {
-          margin-right: 10px;
-          color: #888;
-        }
-  
-        input {
-          width: 100%;
-          border: none;
-          outline: none;
-        }
+          display: flex;
+          align-items: center;
+          background-color: #3a3a3a; // Slightly lighter background for the header
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); // Slightly darker shadow
+          margin-bottom: 20px;
+
+          .icon {
+              margin-right: 10px;
+              color: #ffffff; // White color for icons
+          }
+
+          input {
+              width: 100%;
+              border: none;
+              outline: none;
+              background-color: #4a4a4a; // Background for input field
+              color: #ffffff; // Text color for input
+              padding: 5px; // Add some padding for better usability
+              border-radius: 3px; // Rounded corners for input
+          }
       }
-  
+
       .sidebar-link {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: #333;
-        font-size: 14px;
-  
-        .icon {
-          margin-right: 10px;
-          color: #888;
-        }
-  
-        &:hover {
-          background-color: #e3e3e3;
-        }
+          display: flex;
+          align-items: center;
+          padding: 10px;
+          margin-bottom: 5px;
+          border-radius: 5px;
+          text-decoration: none;
+          color: #ffffff; // White color for link text
+          font-size: 14px;
+
+          .icon {
+              margin-right: 10px;
+              color: #ffffff; // White color for icons in links
+          }
+
+          &:hover {
+              background-color: #444; // Darker background on hover
+          }
       }
-    }
   }
-  
+}
+
+.hamburger-menu{
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 15px;
+    z-index: 999;
+    cursor: pointer;
+    .icon{
+        color: #ffffff;
+        font-size: 28px;
+    }
+}
+
+@media(max-width: 1100px){
+    .sidebar{
+        transform: translateX(-100%);
+    }
+    .sidebar.open{
+        transform: translateX(0);
+    }
+    .hamburger-menu{
+        display: block;
+    }
+}

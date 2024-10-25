@@ -1,0 +1,90 @@
+// ProjectComponent.scss
+
+.project-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px; // More gap between cards for better layout
+    padding: 30px; // Extra padding for breathing room
+  
+    .project-card {
+      background-color: #262626; // Darker card background (Crunchyroll-inspired)
+      color: #f5f5f5; // Lighter text for contrast
+      padding: 25px;
+      border-radius: 10px; // Smoother corners
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); // Softer shadow for a clean look
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+      &:hover {
+        transform: translateY(-5px); // Slight lift effect
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4); // Stronger shadow on hover
+        border: 1px solid #f47521; // Orange border on hover (Crunchyroll orange)
+      }
+  
+      img {
+        border-radius: 5px;
+        border: 2px solid #f47521; // Orange border around images to match Crunchyroll's theme
+      }
+  
+      h6 {
+        color: #f47521; // Crunchyroll orange for headings
+        margin-bottom: 12px;
+        font-weight: bold;
+        font-size: 18px; // Bold, larger font for emphasis
+      }
+    }
+  }
+  
+  // Modal custom styling
+  .MuiDialog-paper {
+    background-color: #303030 !important; // Darker modal background for better contrast
+    color: #ffffff !important; // Light text inside the modal
+    border-radius: 12px; // Rounded corners
+    margin: 20px; // Added margin between dialog boxes
+  }
+  
+  .MuiDialogTitle-root,
+  .MuiDialogContent-root {
+    color: #f47521 !important; // Crunchyroll-inspired orange text
+  }
+  
+  .MuiDialogActions-root {
+    button {
+      background-color: #f47521; // Crunchyroll orange for action buttons
+      color: #fff;
+      &:hover {
+        background-color: darken(#f47521, 10%); // Slightly darker on hover
+      }
+    }
+  }
+  
+  .MuiBackdrop-root {
+    background-color: rgba(0, 0, 0, 0.85) !important; // Darker backdrop for better focus
+  }
+  
+  // Input field styling inside modal
+  .MuiInputBase-root {
+    background-color: #404040; // Darker input field
+    color: #ffffff;
+    border: 1px solid #f47521; // Orange border for inputs
+  }
+  
+  .MuiFormControl-root {
+    margin-bottom: 20px; // Increased spacing for cleaner layout
+  }
+  
+  .MuiSelect-select {
+    background-color: #404040 !important;
+    color: #ffffff !important;
+    border: 1px solid #f47521 !important; // Matching orange border for consistency
+  }
+  
+  input[type="file"] {
+    color: #ffffff;
+  }
+  
+  // Additional padding for dialogs
+  .MuiDialogContent-root {
+    padding: 20px !important; // Ensures more space inside modal content
+  }
+  
+  

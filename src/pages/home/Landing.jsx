@@ -5,12 +5,23 @@ import AboutCard from "../../AboutCard/AboutCard";
 
 import Section2 from "../../AboutCard/Section2";
 import Navbar from "../../AboutCard/Navbar";
+import LandingHeroSection from "../../AboutCard/LandingHeroSection";
+import Curated from './curated/Curated';
 
 const Landing = () => {
   return (
     <div>
       <Navbar />
-      <HeroBanner />
+      {/* <HeroBanner /> */}
+      <LandingHeroSection />
+      
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <Curated/>
+      
       <AboutCard />
 
       <br />
@@ -20,6 +31,8 @@ const Landing = () => {
       <br />
       <br />
       <br />
+
+      
       <Section2 />
 
       <br />

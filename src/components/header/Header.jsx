@@ -4,11 +4,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import "./style.scss";
 import ContentWrapper from "../contentWrapper/ContentWrapper";
-import logo from "../../assets/movix-logo.svg";
+import { FiSettings } from "react-icons/fi";
 import avatar from "../../assets/avatar.png";
 import { setUserId } from "../../store/userAction"; // Import the action to set userId
 import axios from "axios";
 import logozp from "/src/assets/logoZP.png";
+import { CiLogout } from "react-icons/ci";
+
+
 
 const Header = () => {
   const [show, setShow] = useState("top");
@@ -24,6 +27,9 @@ const Header = () => {
   const userId = userIdRedux || userIdLocalStorage; // Use userId from Redux if available, otherwise use local storage
   const [userName, setUserName] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
+  
+ 
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,12 +79,56 @@ const Header = () => {
     };
   }, [lastScrollY]);
 
-  const searchQueryHandler = (event) => {
+  const searchQueryHandler = async (event) => {
     if (event.key === "Enter" && query.length > 0) {
-      navigate(`/search/${query}`);
+      console.log(`Search query: ${query}`);
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/users/username/${query}`
+        );
+        const results = response.data;
+        console.log("results are:", results);
+
+        // Check if results array is not empty
+        if (results.length > 0) {
+          console.log("Search results:", results);
+          console.log("First user result:", results[0]); // Log the first user in the array
+        } else {
+          console.log("No users found.");
+        }
+
+        navigate(`/search/${query}`);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
       setTimeout(() => {
         setShowSearch(false);
       }, 1000);
+    }
+  };
+
+  const handleSearchClick = async () => {
+    if (query.length > 0) {
+      console.log(`Search query: ${query}`);
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/users/username/${query}`
+        );
+        const results = response.data;
+
+        // Check if results array is not empty
+        if (results.length > 0) {
+          console.log("Search results:", results);
+          console.log("First user result:", results[0]); // Log the first user in the array
+        } else {
+          console.log("No users found.");
+        }
+
+        navigate(`/search/${query}`);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+      setShowSearch(false);
     }
   };
 
@@ -105,6 +155,8 @@ const Header = () => {
     navigate("/forum");
   };
 
+ 
+
   return (
     <header
       className={`header ${show}`}
@@ -119,7 +171,7 @@ const Header = () => {
           <img src={logozp} alt="Logo" />
         </div>
         <form className="search-bar">
-          <span className="search-icon">
+          <span className="search-icon" onClick={handleSearchClick}>
             <FaSearch />
           </span>
           <input
@@ -152,8 +204,15 @@ const Header = () => {
             {showProfileOptions && (
               <div className="profile-options">
                 <ul>
-                  <li onClick={handleVisitProfile}>Visit Profile</li>
-                  <li onClick={handleLogout}>Logout</li>
+                  <li onClick={handleVisitProfile}> Profile</li>
+                  <hr />
+                  <li onClick={handleLogout}>
+                    <CiLogout className="header-icon" />
+                    VisitLogout
+                  </li>
+                  <li>
+                    <FiSettings className="header-icon" /> Settings
+                  </li>
                 </ul>
               </div>
             )}
@@ -174,7 +233,10 @@ const Header = () => {
           </ContentWrapper>
         </div>
       )}
+
+   
     </header>
+    
   );
 };
 

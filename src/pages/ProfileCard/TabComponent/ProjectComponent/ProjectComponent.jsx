@@ -13,56 +13,51 @@ import {
   Select,
   InputLabel,
   Chip,
+  CircularProgress,
+  IconButton,
   Box,
 } from "@mui/material";
+// import CloseIcon from "@mui/icons-material/Close";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Img from "../../../../components/lazyLoadImage/Img";
 import "./ProjectComponent.scss";
-import DummyCards from "./Others/Others";
 import { useSelector } from "react-redux";
 import ContentWrapper from "../../../../components/contentWrapper/ContentWrapper";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 const ProjectComponent = () => {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const userIdRedux = useSelector((state) => state.user.userId);
   const userIdLocalStorage = localStorage.getItem("Id");
   const userId = userIdRedux || userIdLocalStorage;
-  const generateUniqueId = () => {
-    return Date.now() + Math.floor(Math.random() * 1000);
-  };
+  const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     thumbnailImage: "",
+    category: "",
     thumbnailLink: [],
     tags: [],
     username: localStorage.getItem("username"),
     id: generateUniqueId(),
   });
-  
+
   const [submittedData, setSubmittedData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [uploading, setUploading] = useState(false); // Uploading state for progress
   const [error, setError] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [fetchedUsername, setFetchedUsername] = useState(""); // State to store fetched username
+  const [fetchedUsername, setFetchedUsername] = useState("");
   
-  const { id } = useParams(); // Get user ID from params
+  const { id } = useParams();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
   const isOwner = id === userId;
-
   const navigate = useNavigate();
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,26 +71,13 @@ const ProjectComponent = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleTagChange = (event) => {
-    const { target: { value } } = event;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      tags: typeof value === "string" ? value.split(",") : value,
-    }));
-  };
-
-  const handleTagDelete = (tagToDelete) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      tags: prevFormData.tags.filter((tag) => tag !== tagToDelete),
-    }));
-  };
-
   const handleSubmit = async () => {
     try {
+      setUploading(true); // Set uploading state to true
       const data = new FormData();
       data.append("name", formData.name);
       data.append("description", formData.description);
+      data.append("category", formData.category);
       data.append("tags", formData.tags.join(","));
       data.append("username", formData.username);
       data.append("id", formData.id);
@@ -115,12 +97,14 @@ const ProjectComponent = () => {
       );
 
       setSubmittedData([...submittedData, response.data]);
+      setUploading(false); // Reset uploading state
       handleClose();
       setFormData({
         name: "",
         description: "",
         id: generateUniqueId(),
         thumbnailImage: [],
+        category: "",
         tags: [],
         username: localStorage.getItem("username"),
       });
@@ -128,30 +112,29 @@ const ProjectComponent = () => {
       navigate(`/details/${response.data.projectId}`);
     } catch (error) {
       console.error("Error posting form data:", error);
+      setUploading(false); // Reset uploading state on error
     }
   };
 
-  // Fetch user details based on the userId in URL params
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/users/${id}`); // Fetch using the ID from params
+        const response = await axios.get(`${apiBaseUrl}/users/${id}`);
         if (response.data.username) {
-          setFetchedUsername(response.data.username); // Set fetched username
+          setFetchedUsername(response.data.username);
           localStorage.setItem("username", response.data.username);
         } else {
-          setFetchedUsername(""); // No user found
+          setFetchedUsername("");
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
-        setFetchedUsername(""); // No valid username if error occurs
+        setFetchedUsername("");
       }
     };
 
     fetchUserDetails();
   }, [id]);
 
-  // Fetch projects if username is available
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -159,27 +142,25 @@ const ProjectComponent = () => {
         const response = await axios.get(`${apiBaseUrl}/projects/username/${fetchedUsername}`);
         setSubmittedData(response.data);
       } else {
-        setSubmittedData([]); // No projects if no valid username
+        setSubmittedData([]);
       }
     } catch (error) {
-      setError(error);
+      console.log("Please upload your project here");
     }
     setLoading(false);
   };
 
-  // Fetch projects after username is set
   useEffect(() => {
     if (fetchedUsername) {
       fetchData();
     }
   }, [fetchedUsername]);
 
-
-  const currencies = [
-    { value: "Coding", label: "Coding" },
-    { value: "Case Studies", label: "Case Studies" },
-    { value: "Research", label: "Research" },
-    { value: "Arts&Literature", label: "Arts&Literature" },
+  const categories = [
+    { value: "Artworks", label: "Artworks" },
+    { value: "Books", label: "Books" },
+    { value: "Comics", label: "Comics" },
+    { value: "Fan Art", label: "Fan Art" },
   ];
 
   useEffect(() => {
@@ -191,7 +172,16 @@ const ProjectComponent = () => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Project</DialogTitle>
+        <DialogTitle>
+          Add Comic Project
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            style={{ position: "absolute", right: 8, top: 8 }}
+          >
+            {/* <CloseIcon /> */}
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -206,6 +196,7 @@ const ProjectComponent = () => {
             required
             error={!formData.name}
             helperText={!formData.name && "Project Name is required"}
+            sx={{ marginBottom: 2 }} // Add space between fields
           />
           <TextField
             margin="dense"
@@ -218,37 +209,25 @@ const ProjectComponent = () => {
             rows={4}
             value={formData.description}
             onChange={handleChange}
+            sx={{ marginBottom: 2 }} // Add space between fields
           />
-          <input type="file" onChange={handleFileChange} accept="image/*" />
-          <FormControl fullWidth>
-            <InputLabel id="tags-label">Tags</InputLabel>
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel id="category-label">Category</InputLabel>
             <Select
-              labelId="tags-label"
-              id="tags"
-              name="tags"
-              multiple
-              value={formData.tags}
-              onChange={handleTagChange}
-              renderValue={(selected) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip
-                      key={value}
-                      label={value}
-                      onDelete={() => handleTagDelete(value)}
-                    />
-                  ))}
-                </Box>
-              )}
+              labelId="category-label"
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
             >
-              {currencies.map((option) => (
+              {categories.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <DummyCards />
+          <input type="file" onChange={handleFileChange} accept="image/*" style={{ marginBottom: 16 }} />
           <ContentWrapper>
             <div>
               {formData.thumbnailImage &&
@@ -268,9 +247,16 @@ const ProjectComponent = () => {
           <Button onClick={handleSubmit}>Submit</Button>
         </DialogActions>
       </Dialog>
+
       {loading && <p>Loading...</p>}
+      {uploading && (
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", margin: "20px 0" }}>
+          <CircularProgress />
+        </Box>
+      )}
       {error && <p>Error: {error.message}</p>}
-      <div className="project-cards-container">
+
+<div className="project-cards-container">
         {submittedData && submittedData.length > 0 ? (
           submittedData.map((project, index) => (
             <Card
@@ -307,13 +293,7 @@ const ProjectComponent = () => {
                   color: "white",
                 }}
               >
-                <Typography
-                  variant="p"
-                  component="div"
-                  style={{ marginBottom: "5px" }}
-                >
-                  {project.name}
-                </Typography>
+                <Typography variant="h6">{project.name}</Typography>
               </div>
             </Card>
           ))
@@ -321,7 +301,7 @@ const ProjectComponent = () => {
           <p>No projects found.</p>
         )}
       </div>
-      {isOwner && (
+{isOwner && (
         <Button variant="contained" onClick={handleOpen}>
           Add Project
         </Button>

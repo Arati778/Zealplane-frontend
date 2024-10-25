@@ -125,6 +125,14 @@ const HeroBanner = ({ selectedPosterUrl }) => {
                         maxLength={100}
                       />
                     </div>
+                    <div className="userInfo">
+    <img
+      className="profilePicture"
+      src={project.profilePic} // Assuming the field is profilePicture
+      alt={project.username}
+    />
+    <span className="username">{project.username}</span>
+  </div>
 
                     <div className="iconsContainer">
                       <div className="icons">

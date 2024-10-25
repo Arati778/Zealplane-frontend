@@ -4,8 +4,9 @@
   padding: 20px;
   background-color: #1a1a1b; /* Dark background like Reddit */
   border: 1px solid #343536; /* Darker border */
-  border-radius: 8px;
+  border-radius: 20px;
   color: #d7dadc; /* Light text color */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Add a shadow for depth */
 }
 
 .create-post h2 {
@@ -25,8 +26,7 @@
   font-weight: 600; /* Bolder labels */
 }
 
-.create-post input,
-.create-post textarea {
+.create-post input {
   width: 100%;
   padding: 10px; /* Increased padding for better readability */
   background-color: #272729; /* Reddit-like input background */
@@ -36,9 +36,15 @@
   box-sizing: border-box;
 }
 
-.create-post input::placeholder,
-.create-post textarea::placeholder {
+.create-post input::placeholder {
   color: #818384; /* Lighter placeholder text */
+}
+
+.create-post .quill {
+  border: 1px solid #343536; /* Add border for the Quill editor */
+  border-radius: 4px; /* Round the corners */
+  margin-bottom: 15px; /* Space below the editor */
+  background-color: #272729; /* Match the input background */
 }
 
 .create-post button {
@@ -57,7 +63,20 @@
   background-color: #cc3700; /* Darker orange on hover */
 }
 
-.create-post textarea {
-  height: 100px; /* Fixed height for the textarea */
-  resize: vertical; /* Allow vertical resizing */
+.create-post .user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Space below user info */
+}
+
+.create-post .user-info img {
+  width: 40px; /* Profile picture size */
+  height: 40px; /* Profile picture size */
+  border-radius: 50%; /* Circular profile picture */
+  margin-right: 10px; /* Space between image and username */
+}
+
+.create-post .user-info .username {
+  color: #d7dadc; /* Light color for username */
+  font-weight: bold; /* Bolder username */
 }

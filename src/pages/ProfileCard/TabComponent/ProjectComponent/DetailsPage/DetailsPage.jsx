@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Card,
   IconButton,
   Modal,
   Box,
-  TextField,
   Button,
-  Breadcrumbs,
-  Link,
   Typography,
+  Grid,
+  Snackbar,
+  Alert,
+  CircularProgress
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -43,13 +43,16 @@ import HeroBannerData from "../../../../home/heroBanner/HeroBannerData";
 import { MdShare, MdThumbUp } from "react-icons/md";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for styling
-import Lightbox from "yet-another-react-lightbox";
+
 
 
 const DetailsPage = () => {
   const { projectId } = useParams();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [projectData, setProjectData] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
   const userIdRedux = useSelector((state) => state.user.userId);
   const userIdLocalStorage = localStorage.getItem("Id");
@@ -65,8 +68,11 @@ const DetailsPage = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   // State for Thumbs
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false); // Lightbox state
-  const [lightboxIndex, setLightboxIndex] = useState(0); // Track current image index for the lightbox
+  const usernameLocalStorage = localStorage.getItem("username"); // Get userId from local storage
+  console.log("username getting from localstorage is:", userIdLocalStorage);
+  
+  const [isOwner, setIsOwner] = useState(false);
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -83,6 +89,15 @@ const DetailsPage = () => {
           `${apiBaseUrl}/projects/id/${projectId}`
         );
         console.log("projectData is:", response.data);
+        console.log("username is:", response.data.username);
+        if (response.data.username === usernameLocalStorage) {
+          console.log("username matched");
+          setIsOwner(true);
+        }else{
+          console.log("username did not matched");
+          setIsOwner(false);
+        }
+        
         setProjectData(response.data);
         setLiked(response.data.likes);
         setLikesCount(response.data.likes || 0); 
@@ -111,15 +126,6 @@ const DetailsPage = () => {
   }, [userId]);
 
 
-  const openLightbox = (index) => {
-    setLightboxIndex(index);
-    setIsLightboxOpen(true);
-  };
-
-
-  const handleCardClick = () => {
-    console.log("Card clicked");
-  };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -142,6 +148,7 @@ const DetailsPage = () => {
       );
 try {
   console.log("Updated project response:", updateResponse.data);
+  toast.success("Your content updated succesfully!");
 } catch (error) {
   console.error("please try again", error);
   
@@ -216,10 +223,25 @@ try {
   }
 };
   
+const handleUpload = async () => {
+  setLoading(true); // Set loading to true when upload starts
+
+  // Call the update function (make sure it returns a promise)
+  await handleUpdateProject();
+
+  setLoading(false); // Set loading to false when upload completes
+  setSnackbarOpen(true); // Show snackbar notification
+  handleClose(); // Close the modal after upload
+};
+
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+};
   
   return (
     <div>
       <Header />
+      <ToastContainer/>
       {projectData ? (
         <ContentWrapper>
           <div className="detailsBanner">
@@ -249,51 +271,55 @@ try {
               <li className="menuItem iconBox">
                 <FaArrowRight className="icon" title="Go to" />
               </li>
-              <li className="menuItem iconBox" onClick={handleOpen}>
+              {isOwner && (
+                <>
+                <li className="menuItem iconBox" onClick={handleOpen}>
                 <FaPencilAlt className="icon" title="Edit" />
               </li>
               <li className="menuItem iconBox" onClick={handleOpen}>
                 <FaTrash className="icon" title="Delete Project" />
               </li>
+                </>
+              )
+              }
             </ul>
            
             <div className="content">
               <div className="left">
-                <Swiper
-                  style={{
-                    "--swiper-navigation-color": "#fff",
-                    "--swiper-pagination-color": "#fff",
-                  }}
-                  lazy={true}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  thumbs={{ swiper: thumbsSwiper }}
-                  navigation={true}
-                  modules={[Pagination, Navigation, Thumbs]}
-                  className="mySwiper"
-                >
-                  {projectData.thumbnailImages &&
-                  projectData.thumbnailImages.length > 0 ? (
-                    projectData.thumbnailImages.map((image, index) => (
-                      <SwiperSlide key={index} onClick={() => openLightbox(index)}>
-                        <Img
-                          className="thumbImg"
-                          src={image || PosterFallback}
-                          alt={`Thumbnail ${index + 1}`}
-                        />
-                      </SwiperSlide>
-                    ))
-                  ) : (
-                    <SwiperSlide>
-                      <Img
-                        className="thumbImg"
-                        src={projectData.thumbnailImages || PosterFallback}
-                        alt="Thumbnail"
-                      />
-                    </SwiperSlide>
-                  )}
-                </Swiper>
+              <Swiper
+  style={{
+    "--swiper-navigation-color": "#fff",
+    "--swiper-pagination-color": "#fff",
+  }}
+  lazy={true}
+  pagination={{
+    clickable: true,
+  }}
+  thumbs={{ swiper: thumbsSwiper }}
+  navigation={true}
+  modules={[Pagination, Navigation, Thumbs]}
+  className="mySwiper"
+>
+  {projectData.thumbnailImages && projectData.thumbnailImages.length > 0 ? (
+    projectData.thumbnailImages.map((image, index) => (
+      <SwiperSlide key={index} onClick={() => window.open(projectData.thumbnailImages[index], '_blank')}>
+        <Img
+          className="thumbImg"
+          src={image || PosterFallback}
+          alt={`Thumbnail ${index + 1}`}
+        />
+      </SwiperSlide>
+    ))
+  ) : (
+    <SwiperSlide>
+      <Img
+        className="thumbImg"
+        src={projectData.thumbnailImages || PosterFallback}
+        alt="Thumbnail"
+      />
+    </SwiperSlide>
+  )}
+</Swiper>
 
                 {/* Thumbnail Swiper */}
                 <Swiper
@@ -330,7 +356,6 @@ try {
                 
               </div>
               <div className="description1">{projectData.description}</div>
-
               <div className="right">
                 <div className="project-container row-layout">
                   {HeroBannerData.map((project, index) => (
@@ -434,30 +459,66 @@ try {
         <p>Loading...</p>
       )}
       <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            width: 400,
-            padding: 2,
-            backgroundColor: "white",
-            margin: "auto",
-            marginTop: "20vh",
-            borderRadius: 2,
+      <Box
+        sx={{
+          width: 400,
+          padding: 2,
+          backgroundColor: 'white',
+          margin: 'auto',
+          marginTop: '20vh',
+          borderRadius: 2,
+        }}
+      >
+       <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
+  Edit Project
+</Typography>
+
+        {/* File input for images */}
+        <input
+          type="file"
+          multiple
+          onChange={(e) => {
+            handleFileChange(e);
+            setUploadedFiles(Array.from(e.target.files)); // Update uploaded files
           }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Edit Project
-          </Typography>
-          <input
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            accept="image/*"
-          />
+          accept="image/*"
+          style={{ display: 'block', marginBottom: '10px' }} // Styles for the file input
+        />
+
+        {/* Preview of uploaded images */}
+        {uploadedFiles.length > 0 && (
+          <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+            {uploadedFiles.map((file, index) => (
+              <img
+                key={index}
+                src={URL.createObjectURL(file)}
+                alt={`Preview ${index + 1}`}
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '4px',
+                  objectFit: 'cover',
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', // Adds shadow to preview
+                }}
+              />
+            ))}
+          </Box>
+        )}
+
+        {/* Loading spinner and buttons */}
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+            <CircularProgress /> {/* Loading spinner */}
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              Uploading...
+            </Typography>
+          </Box>
+        ) : (
           <Box mt={2} display="flex" justifyContent="space-between">
             <Button
               variant="contained"
               color="primary"
-              onClick={handleUpdateProject}
+              onClick={handleUpload} // Use the upload handler
             >
               Update
             </Button>
@@ -465,8 +526,16 @@ try {
               Cancel
             </Button>
           </Box>
-        </Box>
-      </Modal>
+        )}
+
+        {/* Snackbar for feedback */}
+        <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+          <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+            Project updated successfully!
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Modal>
     </div>
   );
 };

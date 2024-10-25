@@ -1,0 +1,130 @@
+.post-list {
+  padding: 20px;
+  background-color: #2a2a2a; 
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+
+  .post {
+    background-color: #1C1C1C; /* Dark background for posts to make orange pop */
+    border: 0.5px solid rgb(61, 61, 61);
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Inner padding */
+    margin-bottom: 15px; /* Space between posts */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover effects */
+
+    &:hover {
+      transform: translateY(-2px); /* Slight lift effect */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Shadow on hover for depth */
+      background-color: rgb(28, 34, 37);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%; /* Circular profile picture */
+        margin-right: 15px;
+        object-fit: cover;
+      }
+    }
+
+    .post-title-container {
+      display: flex;
+      flex-direction: column; /* Stack title and timestamp */
+      margin-bottom: 10px;
+
+      .post-title {
+        font-size: 18px; /* Title size */
+        font-weight: 600; /* Bold title */
+        color: #f3f3f3; /* Crunchyroll orange for title text */
+        margin: 0; /* Remove default margin */
+
+        a.post-link {
+          color: inherit; /* Inherit color from title */
+          text-decoration: none; /* No underline */
+          transition: color 0.2s; /* Smooth color transition */
+
+          &:hover {
+            color: #ff5500; /* Darker orange on hover */
+          }
+        }
+      }
+
+      .post-timestamp {
+        font-size: 12px; /* Smaller timestamp size */
+        color: #aaa; /* Lighter gray for timestamp */
+        margin-top: 2px; /* Small space between title and timestamp */
+      }
+    }
+
+    .post-body {
+      margin: 10px 0; /* Spacing around the body */
+      color: #ddd; /* Light gray for body text */
+      line-height: 1.6; /* Improve readability */
+    }
+
+    .post-meta {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between; /* Space out the meta info */
+      color: #FFA500; /* Crunchyroll orange for metadata text */
+      box-shadow: 0 -0.5px 1px rgb(138 136 136 / 20%); /* Box shadow from the top */
+      
+
+      .post-likes, .post-comments {
+        font-size: 14px;
+        display: flex;
+        align-items: center; 
+
+        svg {
+          margin-right: 5px; 
+          color: #ff5500; 
+        }
+      }
+
+      .post-likes ,.post-comments, .post-share {
+        color: #FFF; 
+        background: #383633;
+        border-radius: 18px;
+        padding: 5px 9px;
+        font-size: 13px;
+       margin-top: 5px;
+      }
+     
+    }
+  }
+}
+.post-author-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; 
+}
+
+.author-pic {
+  width: 30px; 
+  height: 30px;
+  border-radius: 50%; 
+  margin-right: 8px; 
+}
+
+.post-author {
+  font-weight: bold; 
+  color: #333; 
+}
+
+.post-title {
+  margin: 0; /* Remove default margin */
+}
+.post-image-container {
+  margin: 10px 0;
+}
+
+.post-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 5px;
+}

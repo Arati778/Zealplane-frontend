@@ -1,0 +1,65 @@
+.landing-hero-section {
+    position: relative;
+    width: 100%;
+    height: 600px; /* Adjust the height as needed */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 0 8px 3px rgba(46, 9, 54, 0.7), 0 0 65px 10px rgba(6, 25, 51, 0.5), 0 0 30px 7px rgba(5, 46, 33, 0.4);
+    margin-top: 60px; /* Add margin to push it down below the navbar (adjust as per navbar height) */
+  }
+  
+  .image-wrapper-landing {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .imge {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .image-wrapper-landing::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.7) 24%, rgba(0, 0, 0, 0) 80%);
+    z-index: 1;
+  }
+  
+  .text {
+    position: absolute;
+    top: 50%;
+    right: 50px;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 30%;
+  }
+  
+  .text h1,
+  .text p {
+    color: #fff;
+    margin: 0;
+  }
+  
+  .text button {
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    margin-top: 0.25rem;
+    margin-right: 0.5rem;
+    padding: 0.25rem 1rem;
+    color: #fff;
+  }
+  
+  .text button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  

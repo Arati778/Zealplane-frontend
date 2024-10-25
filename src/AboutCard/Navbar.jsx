@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../AboutCard/NavbarStyle.css"; // Assuming the CSS file is named NavbarStyle.css
-import logozp from "../assets/logo-zp.jpg";
+import logozp from "../assets/logoZP.png";
 import Modal from "../AboutCard/Model";
 import LoginComponent from "../pages/credentials/LoginComponent";
 import RegisterComponent from "../pages/credentials/RegisterComponent";
@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <div className="nav-top">
       <div className="logo-img">
-        <img src={logozp} alt="ZealPlane Logo" className="logo-img" />
+        <img src={logozp} alt="ZealPlane Logo" className="logo-img" /><span style={{color:"red", fontWeight:"900",fontSize:"19px"}}>ZEALPLANE</span>
       </div>
       <div className="nav-menu">
         <button onClick={handleLoginClick}>Log in</button>

@@ -14,14 +14,14 @@ body {
 .card-input-container {
   display: flex;
   flex-direction: column;
-  margin-top: 50px;
+  margin-top: 20px;
   
 
 
   input {
     width: 60%;
     background: transparent;
-    padding: 12px;
+    padding: 8px;
     margin-bottom: 16px;
     display: flex;
     justify-content: end;
@@ -74,7 +74,7 @@ element.style {
   overflow: hidden;
   padding: 20px;
   // margin-top: 15px;
-  margin-bottom: 20px;
+  // margin-bottom: 20px;
 
   /* Edit Button */
   button.Edit {

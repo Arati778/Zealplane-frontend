@@ -44,3 +44,41 @@
     color: #ddd;
   }
 }
+/* Tabs.scss */
+
+.comic-button {
+  background-color: #ff6b00; /* Crunchyroll's orange color */
+  color: #ffffff; /* White text for contrast */
+  border: none; /* No border for a cleaner look */
+  border-radius: 5px; /* Slightly rounded corners */
+  padding: 10px 20px; /* Adequate padding for size */
+  font-size: 16px; /* Font size */
+  font-weight: 600; /* Medium bold font for a sleek look */
+  text-transform: uppercase; /* Uppercase text for a striking appearance */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+
+  /* Add a subtle shadow for depth */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+
+  &:hover {
+    background-color: #ff8c00; /* Lighter orange on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+  }
+
+  &:focus {
+    outline: none; /* Remove outline on focus */
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.5); /* Orange focus ring */
+  }
+}
+
+.navigation-icon {
+  margin-left: 8px; // Adjust as needed for spacing
+  cursor: pointer; // Change cursor to pointer to indicate it's clickable
+  transition: transform 0.2s ease, color 0.2s ease; // Smooth transition for hover effects
+
+  &:hover {
+    transform: scale(1.1); // Slightly enlarge the icon on hover
+    color: #fa3a19; // Change color on hover (choose a color that fits your design)
+  }
+}

@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaFire, FaStar, FaSearch } from 'react-icons/fa';
+import { FaHome, FaFire, FaStar, FaSearch, FaTimes, FaBars } from 'react-icons/fa';
 import './Sidebar.scss';
 
 const Sidebar = () => {
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  }
+
   return (
-    <div className="sidebar">
+   <>
+      <div className="hamburger-menu" onClick={toggleSidebar}>
+          {isOpen? <FaTimes className='icon'/> : <FaBars className='icon'/>}
+      </div>
+
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-section">
-        <div className="sidebar-header">
+        {/* <div className="sidebar-header">
           <FaSearch className="icon" />
           <input type="text" placeholder="Search" />
-        </div>
-        <Link to="/" className="sidebar-link">
+        </div> */}
+        <Link to="/home" className="sidebar-link">
           <FaHome className="icon" /> Home
         </Link>
         <Link to="/popular" className="sidebar-link">
@@ -37,6 +49,7 @@ const Sidebar = () => {
         </Link>
       </div>
     </div>
+    </>
   );
 };
 

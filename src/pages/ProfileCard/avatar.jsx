@@ -3,7 +3,6 @@ import { Col, Row, Upload, Avatar, Button, Modal, Spin, message } from "antd";
 import { UserOutlined, UploadOutlined } from "@ant-design/icons";
 import "./avatar.scss";
 import RadarChartExample from "./radar";
-import MyBio from "./MyBio";
 import ProfileCard from "./ProfileCard";
 import TabComponent from "./TabComponent/Tabs";
 import { useSelector } from "react-redux";
@@ -14,6 +13,7 @@ import { setUserId } from "../../store/userAction"; // Import the action to set 
 import { useDispatch } from "react-redux"; // Import useDispatch hook
 import Header from "../../components/header/Header";
 import { FaTimes, FaEdit } from "react-icons/fa";
+import ProfileImageUploadModal from "./ProfileImageUploadModal/ProfileImageUploadModal";
 
 const AvatarComponent = () => {
   const [activeTabKey, setActiveTabKey] = useState("postroom");
@@ -41,7 +41,12 @@ const AvatarComponent = () => {
   }, [id]);
 
   const openModal = () => {
-    setModalVisible(true);
+    // Check if the userId matches the id from the URL
+    if (userId === id) {
+      setModalVisible(true); // Open the modal if they match
+    } else {
+      alert("You are not authorized to update this profile picture."); // Alert if they don't match
+    }
   };
 
   const closeModal = () => {
@@ -51,6 +56,18 @@ const AvatarComponent = () => {
   const handleTabChange = (key) => {
     setActiveTabKey(key);
   };
+
+  useEffect(() => {
+    // Fetch the token from local storage
+    const authToken = localStorage.getItem('token');
+
+    // Check if token exists and log it
+    if (authToken) {
+      console.log('Auth Token:', authToken);
+    } else {
+      console.log('No Auth Token found in local storage.');
+    }
+  }, []); // Empty dependency array to run this effect only once
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -147,26 +164,6 @@ const AvatarComponent = () => {
   //   return null;
   // }
 
-  useEffect(() => {
-    const fetchGithubData = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.github.com/users/Arati778/repos"
-        );
-        console.log("Github data:", response.data);
-        // Use the response data as needed in your component
-      } catch (error) {
-        console.error("Error fetching GitHub data:", error);
-      }
-    };
-
-    fetchGithubData();
-  }, []);
-
-  const lastDigitsMatch = window.location.href.match(/\d{1,2}$/);
-  const lastDigits = lastDigitsMatch
-    ? lastDigitsMatch[0].padStart(3, "0")
-    : null;
 
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768);
@@ -189,7 +186,7 @@ const AvatarComponent = () => {
             <div style={{ marginTop: "70px" }}>
               <div
                 className="card mb-3"
-                style={{ background: "", color: "white" }}
+                style={{ background: "rgba(55, 65, 122, 0.1)", color: "white" }}
               >
                 <div className="card-body" style={{ marginRight: "10px" }}>
                   <Row justify="center" align="middle">
@@ -364,7 +361,6 @@ const AvatarComponent = () => {
                     color: "white",
                   }}
                 >
-                  <MyBio />
                 </div>
               </div>
             </div>
@@ -393,84 +389,45 @@ const AvatarComponent = () => {
                   }}
                 >
                   <div className="card-body" style={{ marginRight: "10px" }}>
-                    <Row justify="center" align="middle">
-                      <Col>
-                      <Upload
-  showUploadList={false}
-  customRequest={({ file, onSuccess }) => {
-    setFile(file);
-    
-    // Simulate a successful upload
-    setTimeout(() => {
-      onSuccess(null, file);
-      handleFileChange({
-        file: {
-          status: "done",
-          response: { url: URL.createObjectURL(file) }, // Make sure this is set correctly
-        },
-      });
-    }, 1000);
-  }}
-  onChange={(info) => {
-    if (info.file && info.file.status === "done" && info.file.response) {
-      handleFileChange(info);
-    }
-  }}
-  onClick={openModal}
->
-  {profilePic ? (
-    <Avatar
-      size={130}
-      gap={2}
-      src={profilePic}
-      style={{
-        boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
-        border: "2px solid rgba(255, 0, 0, 0.8)",
-      }}
-    />
-  ) : (
-    <Avatar
-      size={150}
-      gap={2}
-      icon={<UserOutlined size={36} />}
-      style={{
-        boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
-        border: "2px solid rgba(255, 0, 0, 0.8)",
-      }}
-    />
-  )}
-</Upload>
+                  <Row justify="center" align="middle">
+      <Col>
+        {/* Avatar that triggers the modal */}
+        {profilePic ? (
+          <Avatar
+            size={130}
+            gap={2}
+            src={profilePic}
+            style={{
+              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
+              border: "2px solid rgba(255, 0, 0, 0.8)",
+            }}
+            onClick={openModal}
+          />
+        ) : (
+          <Avatar
+            size={150}
+            gap={2}
+            icon={<UserOutlined size={36} />}
+            style={{
+              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
+              border: "2px solid rgba(255, 0, 0, 0.8)",
+            }}
+            onClick={openModal}
+          />
+        )}
 
-
-                        <Modal
-                          title="User Details"
-                          visible={modalVisible}
-                          onCancel={closeModal}
-                          footer={[
-                            <Button
-                              key="submit"
-                              type="primary"
-                              onClick={handleFormSubmit}
-                              loading={loading}
-                            >
-                              {loading ? <Spin /> : "Upload Image"}
-                            </Button>,
-                            <Button key="cancel" onClick={closeModal}>
-                              Ok
-                            </Button>,
-                          ]}
-                        >
-                          {profilePic && (
-                            <img
-                              src={profilePic}
-                              alt="User Image"
-                              style={{ maxWidth: "100%" }}
-                            />
-                          )}
-                        </Modal>
-                      </Col>
-                    </Row>
-
+        {/* Use the modal component here */}
+        <ProfileImageUploadModal
+          modalVisible={modalVisible}
+          closeModal={closeModal}
+          handleFileChange={handleFileChange}
+          handleFormSubmit={handleFormSubmit}
+          loading={loading}
+          profilePic={profilePic}
+          setFile={setFile}
+        />
+      </Col>
+    </Row>
                     <div className="text-center text-sm-left mb-2 mb-sm-0">
                       {isEditMode ? (
                         <>

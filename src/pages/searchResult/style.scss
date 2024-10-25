@@ -1,29 +1,95 @@
 @import "../../mixins.scss";
+
 .searchResultsPage {
     min-height: 700px;
     padding-top: 100px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--dark-background); // Optional: Set background color
+    
     .resultNotFound {
         font-size: 24px;
         color: var(--black-light);
+        text-align: center;
+        margin-top: 50px;
     }
+
     .pageTitle {
-        font-size: 24px;
-        line-height: 34px;
+        font-size: 32px;
+        line-height: 40px;
         color: white;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
+        text-align: center;
     }
+
     .content {
         display: flex;
-        flex-flow: row wrap;
-        gap: 10px;
+        justify-content: center;
+        flex-wrap: nowrap; // Change to nowrap for horizontal layout
+        overflow-x: auto; // Allow horizontal scrolling if necessary
+        gap: 15px; // Adjust gap between cards
         margin-bottom: 50px;
-        @include md {
-            gap: 20px;
-        }
-        .movieCard {
-            .posterBlock {
-                margin-bottom: 20px;
+        
+        .userCard {
+            background-color: var(--card-background, #1e1e1e); // Background color for the card
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Add subtle shadow for depth
+            padding: 15px; // Slightly reduce padding
+            width: 200px; // Make card width smaller
+            transition: transform 0.3s ease; // Animation for hover effect
+            
+            &:hover {
+                transform: translateY(-10px); // Slight hover effect
             }
+
+            .profilePic {
+                width: 100%;
+                height: 150px; // Adjust height for smaller cards
+                object-fit: cover; // Ensures the image covers the entire area
+                border-radius: 8px;
+                margin-bottom: 10px; // Adjust bottom margin
+            }
+
+            .userInfo {
+                display: flex;
+                flex-direction: column;
+                gap: 5px; // Reduce gap between info items
+
+                p {
+                    font-size: 14px; // Reduce font size
+                    color: var(--white);
+                    margin: 0;
+
+                    strong {
+                        color: var(--primary-color); // Highlight key fields
+                    }
+                }
+            }
+        }
+    }
+
+    // Media queries for responsiveness
+    @include md {
+        .content {
+            gap: 20px; // Adjust gap on medium screens
+        }
+
+        .userCard {
+            width: 180px; // Adjust card width on medium screens
+        }
+    }
+
+    @include sm {
+        .content {
+            flex-direction: column; // Stack vertically on smaller screens
+            align-items: center;
+            overflow-x: hidden; // Disable horizontal scroll on smaller screens
+        }
+
+        .userCard {
+            width: 100%; // Full width on smaller screens
+            margin-bottom: 10px; // Add margin between cards
         }
     }
 }

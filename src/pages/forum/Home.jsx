@@ -33,7 +33,7 @@ const Home = () => {
       <div className="main-content">
         <Sidebar />
         <main className="content-container">
-          <h2 className="page-title">Recent Posts</h2>
+          {/* <h2 className="page-title">Recent Posts</h2> */}
           <PostList posts={combinedPosts} />
         </main>
       </div>

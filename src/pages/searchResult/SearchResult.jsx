@@ -1,90 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import InfiniteScroll from "react-infinite-scroll-component";
-
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 import "./style.scss";
-
-import { fetchDataFromApi } from "../../utils/api";
+import axios from "axios";
 import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
-import MovieCard from "../../components/movieCard/MovieCard";
-import Spinner from "../../components/spinner/Spinner";
-import noResults from "../../assets/no-results.png";
+import noResults from "../../assets/no-results.png"; // Optional image for no results
+import dummyProfilePic from "../../../public/anonymous-profile-silhouette-b714qekh29tu1anb.png"; // Import your dummy profile pic
 
 const SearchResult = () => {
-    const [data, setData] = useState(null);
-    const [pageNum, setPageNum] = useState(1);
+    const [data, setData] = useState([]); // Store all user data
     const [loading, setLoading] = useState(false);
     const { query } = useParams();
+    const navigate = useNavigate(); // Initialize navigate
 
-    const fetchInitialData = () => {
-        setLoading(true);
-        fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then(
-            (res) => {
-                setData(res);
-                setPageNum((prev) => prev + 1);
-                setLoading(false);
+    const fetchInitialData = async () => {
+        setLoading(true); // Set loading to true before fetching data
+        try {
+            const res = await axios.get(`http://localhost:5000/api/users/username/${query}`);
+            if (Array.isArray(res.data) && res.data.length > 0) {
+                setData(res.data); // Set all users from the array
+                console.log("search results:", res.data); // Log all users for debugging
+            } else {
+                setData([]); // No data found, set data to empty array
             }
-        );
-    };
-
-    const fetchNextPageData = () => {
-        fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then(
-            (res) => {
-                if (data?.results) {
-                    setData({
-                        ...data,
-                        results: [...data?.results, ...res.results],
-                    });
-                } else {
-                    setData(res);
-                }
-                setPageNum((prev) => prev + 1);
-            }
-        );
+        } catch (error) {
+            console.error("Error fetching search results", error); // Log errors if any
+        } finally {
+            setLoading(false); // Set loading to false after data is fetched or an error occurs
+        }
     };
 
     useEffect(() => {
-        setPageNum(1);
         fetchInitialData();
     }, [query]);
 
+    const handleUserClick = (uniqueId) => {
+        // Ensure userId is treated as a string when navigating
+        navigate(`/profile/${String(uniqueId)}`); // Convert userId to a string explicitly
+    };
+
     return (
         <div className="searchResultsPage">
-            {loading && <Spinner initial={true} />}
+            {loading && <div>Loading...</div>}
             {!loading && (
                 <ContentWrapper>
-                    {data?.results?.length > 0 ? (
+                    {data.length > 0 ? (
                         <>
-                            <div className="pageTitle">
-                                {`Search ${
-                                    data?.total_results > 1
-                                        ? "results"
-                                        : "result"
-                                } of '${query}'`}
-                            </div>
-                            <InfiniteScroll
-                                className="content"
-                                dataLength={data?.results?.length || []}
-                                next={fetchNextPageData}
-                                hasMore={pageNum <= data?.total_pages}
-                                loader={<Spinner />}
-                            >
-                                {data?.results.map((item, index) => {
-                                    if (item.media_type === "person") return;
-                                    return (
-                                        <MovieCard
-                                            key={index}
-                                            data={item}
-                                            fromSearch={true}
+                            <div className="pageTitle">{`Search results for '${query}'`}</div>
+                            <div className="content">
+                                {data.map((user) => (
+                                    <div
+                                        className="userCard"
+                                        key={user.uniqueId} // Use userId for the key
+                                        onClick={() => handleUserClick(user.uniqueId)} // Attach onClick event
+                                    >
+                                        <img
+                                            src={user.profilePic || dummyProfilePic} // Use dummy profile pic if no profilePic
+                                            alt={user.username}
+                                            className="profilePic"
                                         />
-                                    );
-                                })}
-                            </InfiniteScroll>
+                                        <div className="userInfo">
+                                            <p><strong></strong> {user.username}</p>
+                                            <p><strong>Full Name:</strong> {user.fullName}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </>
                     ) : (
-                        <span className="resultNotFound">
-                            Sorry, Results not found!
-                        </span>
+                        <div className="resultNotFound">
+                            <img src={noResults} alt="No results found" />
+                            <span>Sorry, no results found!</span>
+                        </div>
                     )}
                 </ContentWrapper>
             )}

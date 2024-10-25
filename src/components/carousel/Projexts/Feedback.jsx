@@ -10,10 +10,11 @@ const Feedback = () => {
   const [rating, setRating] = useState(0);
   const [feedbackList, setFeedbackList] = useState([]);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const username = localStorage.getItem('username');
 
   const { projectId } = useParams(); // Retrieve projectId from URL parameters
   
-  const username = 'TestUser'; // Temporary hardcoded username, replace with actual user data
+
 
   // Fetch comments when the component mounts
   useEffect(() => {
@@ -22,11 +23,11 @@ const Feedback = () => {
         const response = await axios.get(
           `${apiBaseUrl}/projects/id/${projectId}`
         );
-        console.log("Fetched comments:", response.data); // Log the fetched comments
+        console.log("Fetched comments:", response.data.comments);
 
         // Assuming response.data has a structure like { project: { comments: [...] } }
-        setFeedbackList(response.data.comments); // Set the comments array from the project data
-        // console.log("comments are:", feedbackList);
+        setFeedbackList(response.data.comments || []); // Set the comments array from the project data
+        console.log("comments are:", feedbackList);
         
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -40,21 +41,34 @@ const Feedback = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!feedbackText || rating === 0) {
+      alert("Please provide feedback text and a rating!");
+      return;
+    }
+
     const newFeedback = {
       username,
-      body: feedbackText,
+      commentText: feedbackText,
       rating, // Including rating if it's required
     };
 
+    // Retrieve the token (assuming it's stored in localStorage)
+    const token = localStorage.getItem("token");
+
     try {
       const response = await axios.post(
-        `${apiBaseUrl}/projects/${projectId}`,
-        newFeedback
+        `${apiBaseUrl}/projects/${projectId}`, // Adjusted to match typical comment endpoint
+        newFeedback,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token in Authorization header
+          },
+        }
       );
 
       console.log("Comment added successfully:", response.data);
 
-      setFeedbackList([response.data, ...feedbackList]); // Prepend the new feedback to the list
+      setFeedbackList([response.data.comment, ...feedbackList]); // Prepend the new feedback to the list
       setFeedbackText("");
       setRating(0); // Reset after submission
     } catch (error) {
@@ -96,6 +110,7 @@ const Feedback = () => {
           Submit
         </button>
       </form>
+
       <div className="feedback-list">
         <h3 className="feedback-list-title">Recent Feedback</h3>
         {feedbackList.length === 0 ? (
@@ -104,19 +119,19 @@ const Feedback = () => {
           feedbackList.map((feedback, index) => (
             <div className="feedback-item" key={feedback._id || index}>
               <div className="feedback-info">
-                <img src={avatar} alt="Profile" className="feedback-avatar" />
+                <img 
+                  src={feedback.profilePic || avatar} // Use actual profilePic or fallback to placeholder
+                  alt="Profile" 
+                  className="feedback-avatar" 
+                />
                 <div>
-                  <div className="feedback-user">{`${index + 1}. ${
-                    feedback.username || 'Anonymous'
-                  }`}</div>
+                  <div className="feedback-user">{`${index + 1}. ${feedback.username || 'Anonymous'}`}</div>
                   <div className="feedback-time">
-                  <div className="feedback-time">
-                {/* {formatDistanceToNow(new Date(feedback.timestamp))} ago */}
-              </div>
+                    {formatDistanceToNow(new Date(feedback.date || Date.now()))} ago
                   </div>
                 </div>
               </div>
-              <div className="feedback-text">{feedback.body}</div>
+              <div className="feedback-text">{feedback.commentText || "No comment text"}</div>
               <div className="feedback-rating">Rating: {feedback.rating} ★</div>
             </div>
           ))
