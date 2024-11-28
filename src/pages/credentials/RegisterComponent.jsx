@@ -4,8 +4,9 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import "./RegisterComponent.scss";
 import "/src/AboutCard/ModelStyle.css";
+import logozp from "/src/assets/logoZP.png";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../store/userSlice";
+import { setUser, setUserId } from "../../store/userSlice"; // Import setUserId;
 import glogo from "/src/assets/Google__G__logo.svg.png";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -59,103 +60,116 @@ export default function RegisterComponent({ showModal, handleClose }) {
 
   const handleGoogleRegister = async (credentialResponse) => {
     try {
-      // Extract the Google token from the response
       const googleToken = credentialResponse.credential;
-
       console.log("Google Token:", googleToken);
-      // Send the Google token to your backend
+
+      // Send the Google token to your backend for verification
       const response = await axios.post(
         `${import.meta.env.VITE_PUBLIC_API}/api/users/google-login`,
         { token: googleToken }
       );
 
-      // Save user data to Redux or handle as needed
-      dispatch(setUser(response.data.user));
+      // Log response data from backend
+      console.log("Response from backend:", response.data);
 
-      // localStorage.setItem("user", JSON.stringify(response.data.user));
+      // Store the access token in localStorage
+      localStorage.setItem("accessToken", response.data.token);
+      localStorage.setItem("userData", response.data);
+
+      // Store the user ID (from response) in localStorage and Redux
+      const userId = response.data.user.id; // assuming your backend response has userId as 'id'
+      localStorage.setItem("Id", userId); // Save to localStorage
+      dispatch(setUserId(userId)); // Dispatch user ID to Redux store
+
+      console.log("User ID after Google login:", userId);
+
+      // Save full user data to Redux if needed
+      dispatch(setUser(response.data.user));
 
       // Redirect to the home page
       navigate("/home");
     } catch (err) {
       console.error("Error handling Google Sign-In:", err);
-      toast.error("Google Sign-in failed");
+      toast.error("Google Sign-in failed. Please try again.");
     }
   };
 
   return (
-    <div className="login-wrapper">
-      <ToastContainer />
-      <div className="login-wrapper-inner">
-        <h1 className="heading">Make the most of your professional life</h1>
-        <div className="auth-inputs">
-          <input
-            onChange={(event) =>
-              setCredentials((prevCredentials) => ({
-                ...prevCredentials,
-                username: event.target.value,
-              }))
-            }
-            type="text"
-            className="common-input"
-            placeholder="Your Unique Name"
-          />
-          <input
-            onChange={(event) =>
-              setCredentials((prevCredentials) => ({
-                ...prevCredentials,
-                email: event.target.value,
-              }))
-            }
-            type="email"
-            className="common-input"
-            placeholder="Email or phone number"
-          />
-          <input
-            onChange={(event) =>
-              setCredentials((prevCredentials) => ({
-                ...prevCredentials,
-                password: event.target.value,
-              }))
-            }
-            type="password"
-            className="common-input"
-            placeholder="Password (6 or more characters)"
-          />
-          <input
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            type="password"
-            className="common-input"
-            placeholder="Confirm Password"
-          />
-        </div>
-        <button onClick={register} className="login-btn">
-          Agree & Join
-        </button>
-        <div className="google-btn-container">
-          <p className="go-to-signup">
-            Already on ZealPlan?{" "}
-            <span className="join-now" onClick={() => navigate("/profile")}>
-              Sign in
-            </span>
-          </p>
-        </div>
-        <div>
-          <GoogleLogin
-            clientId="120764277175-k72vhgov1mabn0sr3073oh4ck9v43mgk.apps.googleusercontent.com"
-            onSuccess={handleGoogleRegister}
-            onError={() => toast.error("Google Sign-in failed")}
-            render={(renderProps) => (
-              <button
-                onClick={renderProps.onClick}
-                disabled={renderProps.disabled}
-                className="google-btn"
-              >
-                <img src={glogo} alt="Google logo" className="google-logo" />
-              </button>
-            )}
-          />
+    <>
+      <div className="logo-img">
+        <img src={logozp} alt="ZealPlane Logo" className="logo-img" />
+        <span style={{ color: "red", fontWeight: "900", fontSize: "19px" }}>
+          ZEALPLANE
+        </span>
+      </div>
+      <div className="login-wrapper">
+        <ToastContainer />
+        <div className="login-wrapper-inner">
+          <h1 className="heading">Make the most of your professional life</h1>
+          <div className="auth-inputs">
+            <input
+              onChange={(event) =>
+                setCredentials((prevCredentials) => ({
+                  ...prevCredentials,
+                  username: event.target.value,
+                }))
+              }
+              type="text"
+              className="common-input"
+              placeholder="Your Unique Name"
+            />
+            <input
+              onChange={(event) =>
+                setCredentials((prevCredentials) => ({
+                  ...prevCredentials,
+                  email: event.target.value,
+                }))
+              }
+              type="email"
+              className="common-input"
+              placeholder="Email or phone number"
+            />
+            <input
+              onChange={(event) =>
+                setCredentials((prevCredentials) => ({
+                  ...prevCredentials,
+                  password: event.target.value,
+                }))
+              }
+              type="password"
+              className="common-input"
+              placeholder="Password (6 or more characters)"
+            />
+            <input
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              type="password"
+              className="common-input"
+              placeholder="Confirm Password"
+            />
+          </div>
+          <button onClick={register} className="login-btn">
+            Agree & Join
+          </button>
+          <div className="google-btn-container">
+            <p className="go-to-signup">
+              Already on ZealPlan?{" "}
+              <span className="join-now" onClick={() => navigate("/login")}>
+                Sign in
+              </span>
+            </p>
+          </div>
+          <div>
+            <GoogleLogin
+              onSuccess={(credentialResponse) =>
+                handleGoogleRegister(credentialResponse)
+              }
+              onError={() =>
+                toast.error("Google Sign-in failed. Please try again.")
+              }
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

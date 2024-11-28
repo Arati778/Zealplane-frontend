@@ -4,7 +4,7 @@
   padding: 15px;
   position: fixed;
   left: 0;
-  margin-top: 55px;
+  margin-top: 40px;
   height: 100vh;
   border-right: 1px solid #444; 
   transition: transform 0.3s ease-in-out;
@@ -48,6 +48,7 @@
           display: flex;
           align-items: center;
           padding: 10px;
+          margin-top: 10px;
           margin-bottom: 5px;
           border-radius: 5px;
           text-decoration: none;
@@ -65,28 +66,76 @@
       }
   }
 }
-
-.hamburger-menu{
-    display: none;
+/* Sidebar styling */
+.sidebar-container {
     position: fixed;
-    top: 50px;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background-color: #1a1a1b;
+  z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+  }
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
+  .sidebar-container.closed {
+    transform: translateX(-100%);
+  }
+  .hamburger-menu {
+      display: none;
+    top: 15px;
     left: 15px;
-    z-index: 999;
+    z-index: 1100;
     cursor: pointer;
-    .icon{
-        color: #ffffff;
-        font-size: 28px;
+  }
+  .hamburger-menu .icon {
+    color: #bebdbd;
+    font-size: 24px;
+  }
+  @media (max-width: 1100px) {
+  
+    .hamburger-menu {
+      display: block;
     }
-}
+    .sidebar-container {
+      transform: translateX(-100%); /* Sidebar is hidden by default */
+    }
+  }
+  
 
-@media(max-width: 1100px){
-    .sidebar{
-        transform: translateX(-100%);
-    }
-    .sidebar.open{
-        transform: translateX(0);
-    }
-    .hamburger-menu{
-        display: block;
+.create-community-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+
+    button {
+        background-color: #ff4500; /* Reddit red/orange */
+        color: white;
+        padding: 12px 20px; /* Adequate padding */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+
+        &:hover {
+            background-color: #d74100; /* Darker red on hover */
+            transform: scale(1.05); /* Slightly enlarge the button */
+        }
+
+        &:focus {
+            outline: none;
+            border: 1px solid #ff4500; /* Focused border */
+        }
+
+        &:disabled {
+            background-color: #666; /* Disabled state background */
+            cursor: not-allowed; /* Disable hover effect */
+        }
     }
 }

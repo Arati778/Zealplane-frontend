@@ -160,10 +160,11 @@ const DemoProjectPage = () => {
             aria-label="breadcrumbs"
             className="enhanced-breadcrumbs"
           >
-            <Link onClick={() => navigate("/")} className="breadcrumb-link">
+            <Link onClick={() => navigate("/home")} className="breadcrumb-link">
               <FaHome className="breadcrumb-icon" />
               Home
             </Link>
+            {/* 
             <Link
               onClick={() => navigate("/projects")}
               className="breadcrumb-link"
@@ -171,7 +172,7 @@ const DemoProjectPage = () => {
               <FaFolder className="breadcrumb-icon" />
               Projects
             </Link>
-            <Typography className="breadcrumb-current">Details</Typography>
+            <Typography className="breadcrumb-current">Details</Typography> */}
           </Breadcrumbs>
           <div className="title">
             {/* <h2>This is a Superman for you !! Golden age Superman !</h2> */}
@@ -233,7 +234,7 @@ const DemoProjectPage = () => {
                 pagination={{
                   clickable: true,
                 }}
-                onSwiper={setThumbsSwiper}
+                onSwiper={setThumbsSwiper} // Sync the thumbs swiper with the state
                 spaceBetween={10}
                 slidesPerView={4}
                 freeMode={true}
@@ -244,7 +245,11 @@ const DemoProjectPage = () => {
                 {project &&
                   project.ThumnailLinks.map((img, index) => (
                     <SwiperSlide key={index}>
-                      <img src={img} alt={`Slide ${index}`} loading="lazy" />
+                      <img
+                        src={img}
+                        alt={`Thumbnail ${index}`}
+                        loading="lazy"
+                      />
                       <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                     </SwiperSlide>
                   ))}

@@ -1,51 +1,83 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { CiImageOn } from 'react-icons/ci'; // Import the CiImageOn icon
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
+import "react-toastify/dist/ReactToastify.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { CiImageOn } from "react-icons/ci";
+import { RxCross2 } from "react-icons/rx";
+import axiosInstance from "../.../../../Auth/Axios";
 import "./createPost.scss";
+import Header from "./Component/Header";
+import Sidebar from "./Component/Sidebar";
 
 const CreatePost = () => {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const userIdRedux = useSelector((state) => state.user.userId);
+  const userIdLocalStorage = localStorage.getItem("Id");
+  const userId = userIdRedux || userIdLocalStorage;
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  const getUniqueIdFromToken = () => {
+    if (!token) {
+      console.error("No token found in localStorage");
+      return null;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token); // Decode the token
+      return decodedToken.uniqueId || null; // Return uniqueId if it exists
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
+
+  const uniqueId = getUniqueIdFromToken();
+
   const [formData, setFormData] = useState({
-    title: '',
-    body: '',
-    subreddit: '',
-    author: '', // Will be populated by fetched user data
-    profilePic: '', // Will be populated by fetched user data
-    image: '',
+    title: "",
+    body: "",
+    subreddit: "",
+    author: "",
+    profilePic: "",
+    image: null, // Storing the image as a file
+    uniqueId: null,
   });
 
   const { title, body, subreddit, author, profilePic, image } = formData;
-
-  // Fetch userId from either Redux store or LocalStorage
-  const userIdRedux = useSelector((state) => state.user.userId);
-  const userIdLocalStorage = localStorage.getItem('Id');
-  const userId = userIdRedux || userIdLocalStorage;
-  
-  const navigate = useNavigate();
-  const fileInputRef = useRef(null); // Reference for the hidden file input
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (userId) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
-          const { username, profilePic } = response.data;
+          const response = await axios.get(
+            `http://localhost:5000/api/users/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the request
+              },
+            }
+          );
+          const { username, profilePic } = response.data.user;
           setFormData((prevData) => ({
             ...prevData,
             author: username,
             profilePic,
           }));
         } catch (error) {
-          console.error('Error fetching user details:', error);
+          console.error(
+            "Error fetching user details:",
+            error.response?.data || error.message
+          );
         }
       }
     };
-
     fetchUserDetails();
   }, [userId]);
 
@@ -59,99 +91,172 @@ const CreatePost = () => {
   const handleImageInsert = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // You can add your logic for using the image here
-        setFormData({ ...formData, image: reader.result });
-      };
-      reader.readAsDataURL(file);
+      if (file.size > 1024 * 1024 * 2) {
+        toast.error("Image size should be less than 2MB");
+      } else {
+        setFormData({ ...formData, image: file });
+      }
     }
   };
 
   const handleFileUploadClick = () => {
-    fileInputRef.current.click(); // Simulate a click on the hidden file input
+    document.getElementById("file-input").click();
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    
     if (!author || !profilePic) {
-      toast.error('User information is missing, please try again.');
+      console.error("User information is missing, please try again.");
       return;
     }
-    
+
+    const cleanedBody = body
+      .replace(/<\/?p>/g, "")
+      .replace(/<br\s*\/?>/gi, "\n");
+
+    const postData = new FormData();
+    postData.append("title", title);
+    postData.append("body", cleanedBody);
+    postData.append("subreddit", subreddit);
+    postData.append("author", author);
+    postData.append("profilePic", profilePic);
+    postData.append("uniqueId", uniqueId);
+    if (image) {
+      postData.append("post_image", image); // Appending the image to FormData
+    }
+    console.log("formdta appped=nded succesfully!");
+
     try {
-      const res = await axios.post('http://localhost:5000/api/posts', formData);
-      console.log('Post created:', res.data);
+      const res = await axiosInstance.post(
+        "http://localhost:5000/api/posts",
+        postData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Post created successfully!", res.data);
       navigate(`/post/${res.data._id}`);
-      toast.success('Post created successfully!');
+      console.log("Post created successfully!");
       setFormData({
-        title: '',
-        body: '',
-        subreddit: '',
-        author: '',
-        profilePic: '',
-        image: '',
+        title: "",
+        body: "",
+        subreddit: "",
+        author: "",
+        profilePic: "",
+        image: null,
       });
     } catch (err) {
-      console.error('Error creating post:', err.response?.data || err.message);
-      toast.error('Failed to create post!');
+      if (err.response) {
+        console.error("Error response data:", err.response.data);
+      } else if (err.request) {
+        console.error("Error request data:", err.request);
+      } else {
+        console.error("Error message:", err.message);
+      }
+      toast.error("Failed to create post!");
     }
   };
 
+  const handleRemoveImage = () => {
+    setShowConfirmation(false);
+    setFormData({ ...formData, image: null });
+  };
+
   return (
-    <div className="create-post">
-      <h2>Create a New Post</h2>
-      <div className="user-info">
-        {profilePic && <img src={profilePic} alt="Profile" />}
-        <span className="username">{author}</span>
-      </div>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>Title</label>
-          <input
-            type="text"
-            name="title"
-            value={title}
-            onChange={onChange}
-            required
-          />
+    <div className="app-container">
+      <Header />
+
+      <div className="create-post-container">
+        <div className="sidebar-component">
+          <Sidebar />
         </div>
-        <div>
-          <label>Body</label>
-          <ReactQuill 
-            value={body}
-            onChange={handleBodyChange}
-            required
-            placeholder="Write your post content here..."
-            className="quill"
-          />
-          <div className="file-upload">
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleImageInsert} 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} // Hide the file input
-            />
-            <button type="button" onClick={handleFileUploadClick} className="upload-button">
-              <CiImageOn /> Upload Image {/* Button with icon */}
-            </button>
-            {image && <img src={image} alt="Preview" className="image-preview" />}
+
+        <div className="create-post">
+          <h2>Create a New Post</h2>
+          <div className="user-info">
+            {profilePic && <img src={profilePic} alt="Profile" />}
+            <span className="username">{author}</span>
           </div>
+          <form onSubmit={onSubmit}>
+            <div className="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                name="title"
+                value={title}
+                onChange={onChange}
+                required
+                placeholder="Enter the post title"
+              />
+            </div>
+            <div className="form-group">
+              <label>Body</label>
+              <ReactQuill
+                value={body}
+                onChange={handleBodyChange}
+                required
+                placeholder="Write your post content here..."
+                className="quill"
+              />
+            </div>
+            <div className="form-group">
+              <label>Subreddit</label>
+              <input
+                type="text"
+                name="subreddit"
+                value={subreddit}
+                onChange={onChange}
+                required
+                placeholder="Enter subreddit name"
+              />
+            </div>
+            <div className="file-upload">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageInsert}
+                id="file-input"
+                style={{ display: "none" }}
+              />
+              <button
+                type="button"
+                onClick={handleFileUploadClick}
+                className="upload-button"
+              >
+                <CiImageOn /> Upload Image
+              </button>
+
+              {image && (
+                <div className="image-container">
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Preview"
+                    className="image-preview"
+                  />
+                  <RxCross2
+                    className="remove-icon"
+                    onClick={() => setShowConfirmation(true)}
+                  />
+                </div>
+              )}
+
+              {showConfirmation && (
+                <div className="confirmation-popup">
+                  <p>Are you sure you want to remove this image?</p>
+                  <button onClick={handleRemoveImage}>Yes</button>
+                  <button onClick={() => setShowConfirmation(false)}>No</button>
+                </div>
+              )}
+            </div>
+            <button type="submit" className="submit-button">
+              Create Post
+            </button>
+          </form>
         </div>
-        <div>
-          <label>Subreddit</label>
-          <input
-            type="text"
-            name="subreddit"
-            value={subreddit}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <button type="submit">Create Post</button>
-      </form>
+      </div>
     </div>
   );
 };

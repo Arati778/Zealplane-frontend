@@ -193,7 +193,7 @@
     }
 }
 .username {
-    color: #333; /* Dark color */
+    color: white /* Dark color */
     /* Add any other styles you want */
 }
 
@@ -219,6 +219,7 @@
   
   .swiper-slide img {
     display: block;
+    
     width: 100%;
     height: 100%;
     // object-fit:contain;
@@ -229,24 +230,30 @@
     font-size: 34px;
     margin-bottom: 10px;
   }
-
   .mySwiper2 {
-    height: 18%;
+    height: 85px;
     box-sizing: border-box;
-    padding: 10px 0;
+    margin-top: 10px;
+    margin-left: 50px;
   }
   
-  .mySwiper2 .swiper-slide {
-    width: 100%;
-    height: 70%;
-    opacity: 0.4;
-  }
-  .mySwiper2 .swiper-slide img{
-    object-fit: cover;
-  }
+//   .mySwiper2 .swiper-slide.swiper-slide-active {
+//     opacity: 1 !important; /* Force full visibility for the active thumbnail */
+//     border: 2px solid #fff; /* Add a border to the active thumbnail */
+//     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Highlight with a shadow */
+//     transition: opacity 0.3s ease, box-shadow 0.3s ease, border 0.3s ease; /* Smooth transition */
+//   }
   
-  .mySwiper2 .swiper-slide-thumb-active {
-    opacity: 1;
+//   /* Styles for non-active thumbnails */
+//   .mySwiper2 .swiper-slide {
+//     opacity: 0.7; /* Darken the non-active thumbnails */
+//     transition: opacity 0.3s ease; /* Smooth transition for opacity change */
+//   }
+  
+  .mySwiper2 .swiper-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Ensures the image covers the slide */
   }
   
 //   

@@ -9,7 +9,7 @@ import {
   Grid,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -41,10 +41,12 @@ import Header from "../../../../../components/header/Header";
 import Feedback from "../../../../../components/carousel/Projexts/Feedback";
 import HeroBannerData from "../../../../home/heroBanner/HeroBannerData";
 import { MdShare, MdThumbUp } from "react-icons/md";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for styling
-
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for styling
+import UpdateProjectModal from "./EditProject/EditProject";
+import { jwtDecode } from "jwt-decode";
+import axiosInstance from "../../../../../Auth/Axios";
+import Spinner from "../../../../../components/spinner/Spinner";
 
 const DetailsPage = () => {
   const { projectId } = useParams();
@@ -61,7 +63,7 @@ const DetailsPage = () => {
   const [profilePic, setProfilePic] = useState(null);
   const dispatch = useDispatch();
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0); 
+  const [likesCount, setLikesCount] = useState(0);
   // States for the modal
   const [open, setOpen] = useState(false);
   const [thumbnailImage, setThumbnailImage] = useState(null);
@@ -70,9 +72,10 @@ const DetailsPage = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const usernameLocalStorage = localStorage.getItem("username"); // Get userId from local storage
   console.log("username getting from localstorage is:", userIdLocalStorage);
-  
+  const token = localStorage.getItem("token");
   const [isOwner, setIsOwner] = useState(false);
-
+  const decoded = jwtDecode(token);
+  const [status, setStatus] = useState("");
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -85,22 +88,23 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        const response = await axios.get(
-          `${apiBaseUrl}/projects/id/${projectId}`
+        const response = await axiosInstance.get(
+          `${apiBaseUrl}/projects/id/${projectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        console.log("projectData is:", response.data);
-        console.log("username is:", response.data.username);
-        if (response.data.username === usernameLocalStorage) {
-          console.log("username matched");
-          setIsOwner(true);
-        }else{
-          console.log("username did not matched");
-          setIsOwner(false);
-        }
-        
-        setProjectData(response.data);
-        setLiked(response.data.likes);
-        setLikesCount(response.data.likes || 0); 
+        console.log("project details are", response.data);
+
+        setProjectData(response.data.project);
+        setLiked(response.data.project.likes);
+        setLikesCount(response.data.project.likes || 0);
+        setStatus(response.data.status);
+        setProfilePic(response.data.project.profilePic);
+        setUserName(response.data.project.username);
+        console.log("status is", status);
       } catch (error) {
         console.error("Error fetching project details:", error);
       }
@@ -112,11 +116,11 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(
-          `${apiBaseUrl}/users/${userId}`
-        );
-        setUserName(response.data.username);
-        setProfilePic(response.data.profilePic);
+        const response = await axiosInstance.get(`/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -125,140 +129,109 @@ const DetailsPage = () => {
     fetchUserDetails();
   }, [userId]);
 
-
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleUpdateProject = async () => {
-    const formData = new FormData();
-    formData.append("projectId", projectId);
-    formData.append("thumbnailImage", thumbnailImage); // Assuming thumbnailImage is a file
-
+  const handleLikeClick = async () => {
     try {
-      // Send request to update the project
-      const updateResponse = await axios.post(
-        `${apiBaseUrl}/projects/id/${projectId}`, // Use the correct endpoint
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-try {
-  console.log("Updated project response:", updateResponse.data);
-  toast.success("Your content updated succesfully!");
-} catch (error) {
-  console.error("please try again", error);
-  
-}
-      
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
 
-      // Refresh project data
-      const refreshResponse = await axios.get(
-        `${apiBaseUrl}/projects/id/${projectId}`
+      // If token is not present, redirect to login
+      if (!token) {
+        toast.error("Authentication expired, please login again.");
+        navigate("/login");
+        return;
+      }
+
+      // Optimistically update the UI before the API call
+      setLiked((prevLiked) => !prevLiked);
+      setLikesCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+
+      // Send a request to like/unlike the project
+      const response = await axiosInstance.post(
+        `/projects/${projectId}/like`,
+        {} // No body required
       );
 
-      setProjectData(refreshResponse.data);
-      handleClose();
+      console.log("liked by:", response.data);
+
+      // Show a success toast
+      toast.success("Project liked successfully!");
+
+      // Optionally, if the API returns the updated likes count, you can use that
+      if (response.data && response.data.likes !== undefined) {
+        setLikesCount(response.data.likes);
+      }
     } catch (error) {
-      console.error("Error updating project:", error);
+      console.error("There was an error liking the item:", error);
+
+      // If the error is related to authentication (401), redirect to login
+      if (error.response && error.response.status === 401) {
+        toast.error("Authentication expired, please login again.");
+        localStorage.removeItem("token"); // Remove the expired token
+        navigate("/login"); // Navigate to login page
+      } else {
+        // Rollback UI update if there was an error
+        setLiked((prevLiked) => !prevLiked);
+        setLikesCount((prevCount) => (liked ? prevCount + 1 : prevCount - 1));
+
+        // Show a generic error toast
+        toast.error("There was an error liking the project.");
+      }
     }
   };
 
-  const handleLikeClick = async () => {
+  const onProjectUpdate = async () => {
+    try {
+      const refreshResponse = await axiosInstance.get(
+        `${apiBaseUrl}/projects/id/${projectId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("projects found are:", refreshResponse.data.project);
 
-  try {
-    // Get the token from localStorage
-    const token = localStorage.getItem('token');
-    
-    // If token is not present, redirect to login
-    if (!token) {
-      toast.error("Authentication expired, please login again.");
-      navigate('/login');
-      return;
+      setProjectData(refreshResponse.data.project);
+    } catch (error) {
+      console.error("Error refreshing project data:", error);
     }
+  };
 
-    // Optimistically update the UI before the API call
-    setLiked((prevLiked) => !prevLiked);
-    setLikesCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+  const handleUpload = async () => {
+    setLoading(true); // Set loading to true when upload starts
 
-    // Send a request to like/unlike the project
-    const response = await axios.post(
-      `${apiBaseUrl}/projects/${projectId}/like`,
-      {}, // No body required
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Add the token from localStorage
-        },
-      }
-    );
+    // Call the update function (make sure it returns a promise)
+    await handleUpdateProject();
 
-    console.log("liked by:", response.data);
+    setLoading(false); // Set loading to false when upload completes
+    setSnackbarOpen(true); // Show snackbar notification
+    handleClose(); // Close the modal after upload
+  };
 
-    // Show a success toast
-    toast.success("Project liked successfully!");
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
-    // Optionally, if the API returns the updated likes count, you can use that
-    if (response.data && response.data.likes !== undefined) {
-      setLikesCount(response.data.likes);
-    }
-  } catch (error) {
-    console.error("There was an error liking the item:", error);
+  const openViewer = (images, startIndex) => {
+    const viewerUrl = `/viewer?images=${encodeURIComponent(
+      JSON.stringify(images)
+    )}&start=${startIndex}`;
+    window.open(viewerUrl, "_blank");
+  };
 
-    // If the error is related to authentication (401), redirect to login
-    if (error.response && error.response.status === 401) {
-      toast.error("Authentication expired, please login again.");
-      localStorage.removeItem('authToken'); // Remove the expired token
-      navigate('/login'); // Navigate to login page
-    } else {
-      // Rollback UI update if there was an error
-      setLiked((prevLiked) => !prevLiked);
-      setLikesCount((prevCount) => (liked ? prevCount + 1 : prevCount - 1));
-
-      // Show a generic error toast
-      toast.error("There was an error liking the project.");
-    }
-  }
-};
-  
-const handleUpload = async () => {
-  setLoading(true); // Set loading to true when upload starts
-
-  // Call the update function (make sure it returns a promise)
-  await handleUpdateProject();
-
-  setLoading(false); // Set loading to false when upload completes
-  setSnackbarOpen(true); // Show snackbar notification
-  handleClose(); // Close the modal after upload
-};
-
-const handleSnackbarClose = () => {
-  setSnackbarOpen(false);
-};
-  
   return (
     <div>
       <Header />
-      <ToastContainer/>
+      <ToastContainer />
       {projectData ? (
         <ContentWrapper>
           <div className="detailsBanner">
-          <ToastContainer/>
+            <ToastContainer />
             <div className="title">
               <h1>{projectData.name}</h1>
             </div>
             <ul className="menuItems">
               <li className="menuItem">
-                <img
-                  src={
-                    "https://img.freepik.com/premium-photo/detailed-comic-book-art-young-female-warrior-standing-alone-neoncity-street-ai-generated_665346-45905.jpg" ||
-                    avatar
-                  }
-                  alt=""
-                  className="avatarImage"
-                />
+                <img src={profilePic} alt="" className="avatarImage" />
                 {userName && <span style={{ color: "white" }}>{userName}</span>}
                 <span className="badge">Top Rated</span>
               </li>
@@ -271,55 +244,60 @@ const handleSnackbarClose = () => {
               <li className="menuItem iconBox">
                 <FaArrowRight className="icon" title="Go to" />
               </li>
-              {isOwner && (
+              {status !== "visitor" && (
                 <>
-                <li className="menuItem iconBox" onClick={handleOpen}>
-                <FaPencilAlt className="icon" title="Edit" />
-              </li>
-              <li className="menuItem iconBox" onClick={handleOpen}>
-                <FaTrash className="icon" title="Delete Project" />
-              </li>
+                  <li className="menuItem iconBox" onClick={handleOpen}>
+                    <FaPencilAlt className="icon" title="Edit" />
+                  </li>
+                  <li className="menuItem iconBox" onClick={handleOpen}>
+                    <FaTrash className="icon" title="Delete Project" />
+                  </li>
                 </>
-              )
-              }
+              )}
             </ul>
-           
-            <div className="content">
-              <div className="left">
-              <Swiper
-  style={{
-    "--swiper-navigation-color": "#fff",
-    "--swiper-pagination-color": "#fff",
-  }}
-  lazy={true}
-  pagination={{
-    clickable: true,
-  }}
-  thumbs={{ swiper: thumbsSwiper }}
-  navigation={true}
-  modules={[Pagination, Navigation, Thumbs]}
-  className="mySwiper"
->
-  {projectData.thumbnailImages && projectData.thumbnailImages.length > 0 ? (
-    projectData.thumbnailImages.map((image, index) => (
-      <SwiperSlide key={index} onClick={() => window.open(projectData.thumbnailImages[index], '_blank')}>
-        <Img
-          className="thumbImg"
-          src={image || PosterFallback}
-          alt={`Thumbnail ${index + 1}`}
-        />
-      </SwiperSlide>
-    ))
-  ) : (
-    <SwiperSlide>
-      <Img
-        className="thumbImg"
-        src={projectData.thumbnailImages || PosterFallback}
-        alt="Thumbnail"
-      />
-    </SwiperSlide>
-  )}
-</Swiper>
+
+            <div className="content1">
+              <div className="left1">
+                <Swiper
+                  style={{
+                    "--swiper-navigation-color": "#fff",
+                    "--swiper-pagination-color": "#fff",
+                  }}
+                  lazy={true}
+                  pagination={{
+                    clickable: true,
+                  }}
+                  thumbs={{ swiper: thumbsSwiper }}
+                  navigation={true}
+                  modules={[Pagination, Navigation, Thumbs]}
+                  className="mySwiper"
+                >
+                  {projectData.thumbnailImages &&
+                  projectData.thumbnailImages.length > 0 ? (
+                    projectData.thumbnailImages.map((image, index) => (
+                      <SwiperSlide
+                        key={index}
+                        onClick={() =>
+                          openViewer(projectData.thumbnailImages, index)
+                        }
+                      >
+                        <Img
+                          className="thumbImg"
+                          src={image || PosterFallback}
+                          alt={`Thumbnail ${index + 1}`}
+                        />
+                      </SwiperSlide>
+                    ))
+                  ) : (
+                    <SwiperSlide>
+                      <Img
+                        className="thumbImg"
+                        src={projectData.thumbnailImages || PosterFallback}
+                        alt="Thumbnail"
+                      />
+                    </SwiperSlide>
+                  )}
+                </Swiper>
 
                 {/* Thumbnail Swiper */}
                 <Swiper
@@ -352,11 +330,10 @@ const handleSnackbarClose = () => {
                     </SwiperSlide>
                   )}
                 </Swiper>
-                
-                
+                <div className="description1">{projectData.description}</div>
               </div>
-              <div className="description1">{projectData.description}</div>
-              <div className="right">
+
+              <div className="right1">
                 <div className="project-container row-layout">
                   {HeroBannerData.map((project, index) => (
                     <div key={index} className="project-item">
@@ -387,9 +364,9 @@ const handleSnackbarClose = () => {
                 </div>
               </div>
             </div>
-          
+
             <br />
-      
+
             <h4
               style={{
                 color: "white",
@@ -446,7 +423,9 @@ const handleSnackbarClose = () => {
               </div>
               <div className="like-info">
                 {likesCount > 0 ? (
-                  <p>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</p>
+                  <p>
+                    {likesCount} {likesCount === 1 ? "like" : "likes"}
+                  </p>
                 ) : (
                   <p>Be the first to like the project</p>
                 )}
@@ -456,86 +435,17 @@ const handleSnackbarClose = () => {
           </div>
         </ContentWrapper>
       ) : (
-        <p>Loading...</p>
+        <p>
+          <Spinner />
+        </p>
       )}
-      <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          width: 400,
-          padding: 2,
-          backgroundColor: 'white',
-          margin: 'auto',
-          marginTop: '20vh',
-          borderRadius: 2,
-        }}
-      >
-       <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-  Edit Project
-</Typography>
-
-        {/* File input for images */}
-        <input
-          type="file"
-          multiple
-          onChange={(e) => {
-            handleFileChange(e);
-            setUploadedFiles(Array.from(e.target.files)); // Update uploaded files
-          }}
-          accept="image/*"
-          style={{ display: 'block', marginBottom: '10px' }} // Styles for the file input
-        />
-
-        {/* Preview of uploaded images */}
-        {uploadedFiles.length > 0 && (
-          <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
-            {uploadedFiles.map((file, index) => (
-              <img
-                key={index}
-                src={URL.createObjectURL(file)}
-                alt={`Preview ${index + 1}`}
-                style={{
-                  width: '100px',
-                  height: '100px',
-                  borderRadius: '4px',
-                  objectFit: 'cover',
-                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', // Adds shadow to preview
-                }}
-              />
-            ))}
-          </Box>
-        )}
-
-        {/* Loading spinner and buttons */}
-        {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
-            <CircularProgress /> {/* Loading spinner */}
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              Uploading...
-            </Typography>
-          </Box>
-        ) : (
-          <Box mt={2} display="flex" justifyContent="space-between">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUpload} // Use the upload handler
-            >
-              Update
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={handleClose}>
-              Cancel
-            </Button>
-          </Box>
-        )}
-
-        {/* Snackbar for feedback */}
-        <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-          <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
-            Project updated successfully!
-          </Alert>
-        </Snackbar>
-      </Box>
-    </Modal>
+      <UpdateProjectModal
+        open={open}
+        handleClose={handleClose}
+        projectId={projectId}
+        apiBaseUrl={apiBaseUrl}
+        onProjectUpdate={onProjectUpdate}
+      />
     </div>
   );
 };

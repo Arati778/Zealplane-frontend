@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux"; // Import useDispatch hook
 import Header from "../../components/header/Header";
 import { FaTimes, FaEdit } from "react-icons/fa";
 import ProfileImageUploadModal from "./ProfileImageUploadModal/ProfileImageUploadModal";
+import axiosInstance from "../../Auth/Axios";
 
 const AvatarComponent = () => {
   const [activeTabKey, setActiveTabKey] = useState("postroom");
@@ -31,7 +32,7 @@ const AvatarComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch(); // Initialize useDispatch hook
   const [profilePic, setProfilePic] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [response, setResponse] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const { id } = useParams();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -39,15 +40,6 @@ const AvatarComponent = () => {
   useEffect(() => {
     console.log("User ID:", id);
   }, [id]);
-
-  const openModal = () => {
-    // Check if the userId matches the id from the URL
-    if (userId === id) {
-      setModalVisible(true); // Open the modal if they match
-    } else {
-      alert("You are not authorized to update this profile picture."); // Alert if they don't match
-    }
-  };
 
   const closeModal = () => {
     setModalVisible(false);
@@ -59,44 +51,63 @@ const AvatarComponent = () => {
 
   useEffect(() => {
     // Fetch the token from local storage
-    const authToken = localStorage.getItem('token');
+    const authToken = localStorage.getItem("token");
 
     // Check if token exists and log it
     if (authToken) {
-      console.log('Auth Token:', authToken);
+      console.log("Auth Token:", authToken);
     } else {
-      console.log('No Auth Token found in local storage.');
+      console.log("No Auth Token found in local storage.");
     }
   }, []); // Empty dependency array to run this effect only once
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        if (userId === id) {
-          console.log(
-            "User ID from Redux/Local Storage matches ID from URL:",
-            id
-          );
+        // Add the token to headers
+        const token = localStorage.getItem("token");
+
+        // Use axiosInstance for interceptors
+        const response = await axiosInstance.get(`users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the header
+          },
+        });
+
+        // Log user details and check the status
+        console.log("User details fetched:", response.data.user);
+        setUserDetails(response.data.user);
+        setResponse(response.data);
+        setProfilePic(response.data.user.profilePic);
+
+        // Check status
+        if (response.data.status === "visitor") {
+          console.log("User is a visitor. Editing access is disabled.");
         } else {
-          console.log(
-            "User ID from Redux/Local Storage does not match ID from URL:",
-            id
-          );
+          console.log("User is not a visitor. Editing access is enabled.");
         }
-        const response = await axios.get(
-          `${apiBaseUrl}/users/${id || userId}`
-        );
-        setUserDetails(response.data);
-        setProfilePic(response.data.profilePic); // Correctly access profilePic from response.data
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
 
-    if (userId) {
+    if (id) {
       fetchUserDetails();
     }
-  }, [userId, id]);
+  }, [id]);
+
+  const openModal = () => {
+    // Log the userDetails to check its current state when the modal is triggered
+    console.log("User Details:", response);
+
+    if (response?.status !== "visitor") {
+      // If the user is not a visitor, open the modal
+      setModalVisible(true);
+    } else {
+      // Alert if the user is a visitor and cannot edit the profile
+      alert("You are not authorized to update this profile picture.");
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -164,7 +175,6 @@ const AvatarComponent = () => {
   //   return null;
   // }
 
-
   const handleResize = () => {
     setIsMobile(window.innerWidth <= 768);
   };
@@ -176,12 +186,15 @@ const AvatarComponent = () => {
   }, []);
 
   return (
-    <div className="col" style={{ backgroundColor: "#1e1f23", width: "100%", color: "#d3d4d8" }}>
+    <div
+      className="col"
+      style={{ backgroundColor: "#1e1f23", width: "100%", color: "#d3d4d8" }}
+    >
       <Header />
-      
+
       <ContentWrapper>
         <div className="row">
-        <FaEdit />
+          <FaEdit />
           {isMobile ? (
             <div style={{ marginTop: "70px" }}>
               <div
@@ -286,7 +299,9 @@ const AvatarComponent = () => {
                         {user || userDetails ? (
                           <>
                             <h5 className="pt-sm-2 pb-1 mb-0 mt-3 text-nowrap">
-                              {userDetails.fullName}
+                              {userDetails.fullName
+                                ? userDetails.fullName
+                                : "Username not updated yet"}
                             </h5>
                             <p
                               className="mb-2"
@@ -360,8 +375,7 @@ const AvatarComponent = () => {
                     background: "rgba(55, 65, 122, 0.1)",
                     color: "white",
                   }}
-                >
-                </div>
+                ></div>
               </div>
             </div>
           ) : (
@@ -389,45 +403,45 @@ const AvatarComponent = () => {
                   }}
                 >
                   <div className="card-body" style={{ marginRight: "10px" }}>
-                  <Row justify="center" align="middle">
-      <Col>
-        {/* Avatar that triggers the modal */}
-        {profilePic ? (
-          <Avatar
-            size={130}
-            gap={2}
-            src={profilePic}
-            style={{
-              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
-              border: "2px solid rgba(255, 0, 0, 0.8)",
-            }}
-            onClick={openModal}
-          />
-        ) : (
-          <Avatar
-            size={150}
-            gap={2}
-            icon={<UserOutlined size={36} />}
-            style={{
-              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
-              border: "2px solid rgba(255, 0, 0, 0.8)",
-            }}
-            onClick={openModal}
-          />
-        )}
+                    <Row justify="center" align="middle">
+                      <Col>
+                        {/* Avatar that triggers the modal */}
+                        {profilePic ? (
+                          <Avatar
+                            size={130}
+                            gap={2}
+                            src={profilePic}
+                            style={{
+                              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
+                              border: "2px solid rgba(255, 0, 0, 0.8)",
+                            }}
+                            onClick={openModal}
+                          />
+                        ) : (
+                          <Avatar
+                            size={150}
+                            gap={2}
+                            icon={<UserOutlined size={36} />}
+                            style={{
+                              boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
+                              border: "2px solid rgba(255, 0, 0, 0.8)",
+                            }}
+                            onClick={openModal}
+                          />
+                        )}
 
-        {/* Use the modal component here */}
-        <ProfileImageUploadModal
-          modalVisible={modalVisible}
-          closeModal={closeModal}
-          handleFileChange={handleFileChange}
-          handleFormSubmit={handleFormSubmit}
-          loading={loading}
-          profilePic={profilePic}
-          setFile={setFile}
-        />
-      </Col>
-    </Row>
+                        {/* Use the modal component here */}
+                        <ProfileImageUploadModal
+                          modalVisible={modalVisible}
+                          closeModal={closeModal}
+                          handleFileChange={handleFileChange}
+                          handleFormSubmit={handleFormSubmit}
+                          loading={loading}
+                          profilePic={profilePic}
+                          setFile={setFile}
+                        />
+                      </Col>
+                    </Row>
                     <div className="text-center text-sm-left mb-2 mb-sm-0">
                       {isEditMode ? (
                         <>
@@ -440,7 +454,9 @@ const AvatarComponent = () => {
                           {user || userDetails ? (
                             <>
                               <h5 className="pt-sm-2 pb-1 mb-0 mt-3 text-nowrap">
-                                {userDetails.fullName}
+                                {userDetails.fullName
+                                  ? userDetails.fullName
+                                  : "Username not updated yet"}
                               </h5>
                               <p
                                 className="mb-2"
@@ -499,7 +515,7 @@ const AvatarComponent = () => {
                     }}
                   >
                     <h6 className="card-title font-weight-bold">Rewards</h6>
-                    <RadarChartExample/>
+                    <RadarChartExample />
                   </div>
                 </div>
 

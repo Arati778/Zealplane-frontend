@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaUserCircle } from "react-icons/fa";
+import { FaSearch, FaUserCircle, FaTimes, FaBars } from "react-icons/fa";
 import { BsChatDots } from "react-icons/bs";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiLogIn } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import '../style.scss';
+import "../style.scss";
+
 import logozp from "/src/assets/logoZP.png"; // Import your logo
+import Sidebar from "./Sidebar";
+import Searchbar from "../../../components/header/Searchbar";
+import axiosInstance from "/src/Auth/Axios";
 
 const Header = () => {
   const [query, setQuery] = useState("");
@@ -17,15 +21,24 @@ const Header = () => {
   const userIdLocalStorage = localStorage.getItem("Id");
   const userId = userIdRedux || userIdLocalStorage;
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Fetch user details including profilePic
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (userId) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
-          setUserName(response.data.username);
-          setProfilePic(response.data.profilePic);
+          const response = await axios.get(
+            `http://localhost:5000/api/users/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the request
+              },
+            }
+          );
+          setUserName(response.data.user.username);
+          setProfilePic(response.data.user.profilePic);
         } catch (error) {
           console.error("Error fetching user details:", error);
         }
@@ -46,37 +59,66 @@ const Header = () => {
     }
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <header className="header">
-      <div className="header-logo">
-        <Link to="/home">
-          <img src={logozp} alt="Logo" className="logo" /> {/* Add the logo here */}
-        </Link>
+      <div className="hamburger-menu" onClick={toggleSidebar}>
+        {isSidebarOpen ? (
+          <FaTimes className="icon" />
+        ) : (
+          <FaBars className="icon" />
+        )}
       </div>
-      <nav className="header-nav">
-        {/* <Link to="/home" className="nav-link">Home</Link> */}
-        <Link to="/forum/create-post" className="nav-link">Create Post</Link>
-      </nav>
-      <div className="header-search">
-        <FaSearch onClick={handleSearchClick} />
-        <input
-          type="text"
-          placeholder="Search"
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyUp={searchQueryHandler}
-        />
+
+      <div className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}>
+        <Sidebar />
+      </div>
+      <div className="left-menu">
+        <div className="header-logo">
+          <Link to="/home">
+            <img src={logozp} alt="Logo" className="logo" />{" "}
+            {/* Add the logo here */}
+          </Link>
+        </div>
+        <nav className="header-nav">
+          {/* <Link to="/home" className="nav-link">Home</Link> */}
+          <Link to="/forum/create-post" className="nav-link">
+            Create Post
+          </Link>
+        </nav>
+        <div className="header-search">
+          <Searchbar axiosInstance={axiosInstance} />
+          {/* <FaSearch onClick={handleSearchClick} />
+          <input
+            type="text"
+            placeholder="Search"
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyUp={searchQueryHandler}
+          /> */}
+        </div>
       </div>
       <div className="header-icons">
         <Link to="/messages" className="icon-link" data-tooltip="Messages">
           <BsChatDots />
         </Link>
-        <Link to="/notifications" className="icon-link" data-tooltip="Notifications">
+        <Link
+          to="/notifications"
+          className="icon-link"
+          data-tooltip="Notifications"
+        >
           <IoMdNotificationsOutline />
         </Link>
         <Link to="/login" className="icon-link" data-tooltip="Login">
           <BiLogIn />
         </Link>
-        <Link to={`/profile/${userId}`} className="icon-link" data-tooltip="Profile">
+        <Link
+          to={`/profile/${userId}`}
+          className="icon-link"
+          data-tooltip="Profile"
+        >
           {profilePic ? (
             <img src={profilePic} alt="Profile" className="profile-pic" />
           ) : (

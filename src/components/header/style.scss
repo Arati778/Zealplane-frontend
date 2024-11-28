@@ -5,12 +5,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
-.header {
+.header1 {
     position: fixed;
     top: 0;
     width: 100%;
     height: 60px;
     z-index: 3;
+    gap: 20px;
     display: flex;
     align-items: center;
     transition: all ease 0.5s;
@@ -24,7 +25,7 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 0;
+     
     }
 
     .logo {
@@ -45,15 +46,16 @@
         display: flex;
         align-items: center;
         margin: 0;
+        gap: 0;
         font-family: "Poppins", sans-serif !important;
         // font-family: "Open Sans", sans-serif;
         font-family: Arial, sans-serif; 
-        .menuItem {
+        .menuItem1 {
             height: 60px;
             font-size: 18px;
             font-style:normal;
             display: flex;
-    
+            gap: 12px;
             align-items: center;
             margin: 0 15px;
             color: rgb(223, 223, 223);
@@ -72,7 +74,7 @@
                 }}
         }
     }
-
+  
     .avatarImage {
         width: 45px;
         height: 45px;
@@ -89,43 +91,155 @@
         color: #fff;
     }
 }
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  /* Community Icon */
+  .communityIcon {
+    font-size: 18px;
+  }
+  /* Hover Text (Initially Hidden) */
+.hoverText {
+    display: none;
+    position: absolute;
+    top: -110%; /* Position below the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    color: rgb(217, 216, 216);
+    padding: 5px 10px;
+    border-radius: 10px;
+    // border: 0.1px solid rgb(63, 63, 63);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .iconWrapper:hover .hoverText {
+    display: block;
+    z-index: 10;
+  }  
+
+// .search-bar {
+//     position: relative;
+//     margin: 0 auto;
+//     max-width: 400px;
+//     margin-left: 25px;
+//     display: flex;
+//     align-items: center;
+//     margin-left: 80px;
+//     .search-input {
+//         width: 20rem;
+//         // padding: 7px 20px 8px 20px;
+//         padding: 0.5rem;
+//         padding-left: 1.25rem;
+//         padding-right: 2.25rem;
+//         border: 1px solid #363a42;
+//         border-radius: 999px;
+//         border-width: 1px;
+//         border-color: #ffffff68;
+//         font-size: 16px;
+//         outline: none;
+//         background: transparent;
+//         color: whitesmoke;
+//         transition: border-color 0.3s ease;
+//     }
+
+//     .search-input:focus {
+//         border-color: whitesmoke; /* Change border color on focus */
+//     }
+
+//     .search-icon {
+//         position: absolute;
+//         color: #989797;
+//         right: 10px;
+//         cursor: pointer;
+//     }
+// }
 
 .search-bar {
     position: relative;
     margin: 0 auto;
-    max-width: 400px;
-    margin-left: 25px;
+    max-width: 550px; /* Increased width from 400px to 500px */
     display: flex;
+    margin-left: 25px;
     align-items: center;
-    margin-left: 80px;
-    .search-input {
-        width: 20rem;
-        // padding: 7px 20px 8px 20px;
-        padding: 0.5rem;
-        padding-left: 1.25rem;
-        padding-right: 2.25rem;
+
+    input {
+        width: 550px;
+        padding: 0.5rem 1rem 0.5rem 2.5rem; /* Added left padding to create more gap from the search icon */
         border: 1px solid #363a42;
         border-radius: 999px;
-        border-width: 1px;
-        border-color: #ffffff68;
+        background-color: transparent; /* Black background */
+        color: #fff; /* White text */
+        font-family: "Poppins", sans-serif;
         font-size: 16px;
         outline: none;
-        background: transparent;
-        color: whitesmoke;
-        transition: border-color 0.3s ease;
-    }
 
-    .search-input:focus {
-        border-color: whitesmoke; /* Change border color on focus */
+        &::placeholder {
+            color: #888; /* Placeholder text color */
+        }
+
+        &:focus {
+            border-color: #fff;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
     }
 
     .search-icon {
         position: absolute;
-        color: #989797;
-        right: 10px;
-        cursor: pointer;
+        left: 1rem; /* Adjust icon position relative to the input */
+        color: #fff;
+        font-size: 16px;
+        pointer-events: none; /* Icon doesn't interfere with clicking on input */
     }
 }
+
+.search-results-list {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    // width: 100%;
+    width: 450px;
+    max-height: 400px; /* Limit height for scrolling */
+    background-color: #252629; /* Black background */
+    color: #fff; /* White text */
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+
+    .search-result-item {
+        display: flex;
+        align-items: center; /* Align items vertically */
+        gap: 10px; /* Add space between profile picture and name */
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+        border-bottom: 1px solid #333;
+      
+        &:hover {
+          background-color: #222;
+        }
+      }
+      
+      .search-result-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%; /* Make the image circular */
+        object-fit: cover; /* Ensure image doesn't stretch */
+      }
+      
+
+      .user-jobrole{
+        color: #888;
+      }
+}
+
+
 .publish-btn {
     background-color: #024184;
     color: white;
@@ -142,65 +256,63 @@
 }
 
 @media (max-width: 768px) {
-    .header {
-        margin-bottom: 14px;
-        flex-direction: column;
-        // align-items: flex-start;
-        padding: 10px;
-        // text-align: center;
-        // align-items: center;
+    .header1 {
+        .contentWrapper {
+            flex-direction: row; /* Arrange items in a row */
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 10px;
 
-        // .contentWrapper {
-        //     flex-direction: column;
-        //     align-items: flex-start;
-        // }
+            .logo {
+                flex: 0; /* No extra space */
+                margin-right: 10px;
 
-        .logo {
-            margin-bottom: 12px;
-            img {
-                height: 40px;
-                width: 40px;
-                margin-bottom: 15px;
+                img {
+                    height: 35px; /* Reduce logo size */
+                    width: 35px;  /* Keep proportions */
+                }
+            }
+
+            .search-bar {
+                flex: 1; /* Occupy remaining space */
+                margin: 0;
+
+                input {
+                    width: 100%;
+                    font-size: 14px;
+                    max-width: 110%; /* Increase width of the search bar */
+                }
             }
         }
 
-        .search-bar {
-            max-width: 250px;
-            margin-left: 8px;
-            margin-bottom: 14px;
+        .menuIcons {
             width: 100%;
-        }
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
 
-        .search-input {
-            margin-bottom:13px ;
-            width: 100%;
-            padding: 5px 10px 5px 15px;
-        }
+            .icon {
+                font-size: 1.2em;
+            }
 
-        .search-icon {
-            right: 10px;
-            margin-bottom: 13px;
-        }
-
-       
-    
-        .avatarImage {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-left: 15px;
-            cursor: pointer;
-            margin-bottom: 23px;
+            .avatarImage {
+                width: 40px;
+                height: 40px;
+            }
         }
        
-        
+    }
+    .profile-options{
+        right: 0px;
     }
 }
+
+
 .profile-options {
     position: absolute;
     top: 60px; /* Adjust this depending on your header height */
-    left: 0px;
+    // left: 0px;
     background-color: #1e1e1e; /* DeviantArt dark background */
     border-radius: 8px;
     padding: 5px;

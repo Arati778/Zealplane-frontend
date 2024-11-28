@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+import logozp from "/src/assets/logoZP.png";
 import { useDispatch } from "react-redux";
 import { setUserId } from "../../store/userAction";
 
@@ -23,36 +24,31 @@ export default function LoginComponent() {
     try {
       toast.success("Signed In to ZealPlane!");
 
-      const response = await axios.post(
-        `${apiBaseUrl}/users/login`,
-        {
-          email: credentials.email,
-          password: credentials.password,
-        }
-      );
+      const response = await axios.post(`${apiBaseUrl}/users/login`, {
+        email: credentials.email,
+        password: credentials.password,
+      });
 
       console.log("Response Data after logging in:", response.data);
-      const userId = response.data.id;
-      const username = response.data.username;
-      const token = response.data.token;
 
+      const { id: userId, username, token, refreshToken } = response.data;
+
+      // Store tokens and user details
       localStorage.setItem("Id", userId);
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
-      console.log("token saved are:", token);
-      const id = localStorage.getItem("Id");
-      console.log(
-        "UserId stored in localStorage:",
-        localStorage.getItem("Id")
-      );
-      console.log(
-        "Username stored in localStorage:",
-        localStorage.getItem("username")
-      );
+
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+        console.log("Refresh Token received and saved:", refreshToken);
+      } else {
+        console.warn("No refresh token received in the response.");
+      }
+
       dispatch(setUserId(userId));
       navigate("/home");
     } catch (err) {
-      console.log(err);
+      console.log("Login error:", err);
       toast.error("Please Check your Credentials");
     }
   };
@@ -66,50 +62,62 @@ export default function LoginComponent() {
   };
 
   return (
-    <div className="login-wrapper">
-    <ToastContainer/>
-      <div className="login-wrapper-inner">
-        <h1 className="heading">Sign in</h1>
-        <p className="sub-heading">Stay updated on your professional world</p>
-
-        <div className="auth-inputs">
-          <input
-            onChange={(event) =>
-              setCredentials({ ...credentials, email: event.target.value })
-            }
-            type="email"
-            className="common-input"
-            placeholder="Email or Phone"
-          />
-
-          <div className="password-input-wrapper">
-            <input
-              type={showPassword ? "text" : "password"}
-              className="common-input password-input"
-              placeholder="Password"
-              value={credentials.password}
-              onChange={(event) =>
-                setCredentials({ ...credentials, password: event.target.value })
-              }
-            />
-            <button
-              type="button"
-              className="toggle-password-visibility"
-              onClick={handlePasswordVisibility}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-        </div>
-
-        <button onClick={login} className="login-btn">
-          Sign in
-        </button>
-        <div>Or</div>
-        <button onClick={handleJoinNowClick} className="join-now-btn">
-          Join now
-        </button>
+    <>
+      {" "}
+      <div className="logo-img">
+        <img src={logozp} alt="ZealPlane Logo" className="logo-img" />
+        <span style={{ color: "red", fontWeight: "900", fontSize: "19px" }}>
+          ZEALPLANE
+        </span>
       </div>
-    </div>
+      <div className="login-wrapper">
+        <ToastContainer />
+        <div className="login-wrapper-inner">
+          <h1 className="heading">Sign in</h1>
+          <p className="sub-heading">Stay updated on your professional world</p>
+
+          <div className="auth-inputs">
+            <input
+              onChange={(event) =>
+                setCredentials({ ...credentials, email: event.target.value })
+              }
+              type="email"
+              className="common-input"
+              placeholder="Email or Phone"
+            />
+
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="common-input password-input"
+                placeholder="Password"
+                value={credentials.password}
+                onChange={(event) =>
+                  setCredentials({
+                    ...credentials,
+                    password: event.target.value,
+                  })
+                }
+              />
+              <button
+                type="button"
+                className="toggle-password-visibility"
+                onClick={handlePasswordVisibility}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <button onClick={login} className="login-btn">
+            Sign in
+          </button>
+          <div>Or</div>
+          <button onClick={handleJoinNowClick} className="join-now-btn">
+            Join now
+          </button>
+        </div>
+      </div>
+    </>
   );
 }

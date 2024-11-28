@@ -1,0 +1,71 @@
+.post-header {
+    position: relative; /* Enable absolute positioning for the edit icon */
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    color: #ffffff;
+  
+    .edit-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px; /* Move to the top-right corner */
+        font-size: 1.2rem; /* Smaller icon */
+        color: #888888; /* Gray color */
+        cursor: pointer;
+    
+        &:hover {
+          color: #ffffff; /* Highlight to white on hover */
+        }
+      }
+  
+    .post-title {
+      margin: 10px 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ff4500;
+    }
+  
+    .post-meta {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 15px;
+  
+      .subreddit {
+        color: #62a4ff;
+      }
+  
+      .author {
+        color: #cccccc;
+      }
+    }
+  
+    .post-body {
+      p {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #cccccc;
+      }
+  
+      .post-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+        background-color: #2c2c2c;
+        border-radius: 8px;
+        overflow: hidden; /* Ensure the image stays within the border radius */
+  
+        img {
+          width: 100%; /* Full width */
+          max-width: 600px; /* Max width for larger screens */
+          height: auto; /* Maintain aspect ratio */
+          max-height: 400px; /* Ensure consistent height like Reddit */
+          object-fit: cover; /* Ensures the image scales properly */
+          background-color: #2c2c2c;
+          padding: 0;
+          border: 1px solid #444; /* Optional border for a cleaner look */
+        }
+      }
+    }
+  }
+  

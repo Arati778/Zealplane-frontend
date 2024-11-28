@@ -1,5 +1,6 @@
 .backa-comic-main {
     display: flex;
+    
     justify-content: space-between; /* Maintain space between sections */
 }
 
@@ -43,7 +44,11 @@
 
 .backa-image {
     text-align: center;
+    
     margin-top: 50px; /* Space above the image */
+}
+.backa-image img{
+    box-shadow: 0 0 8px 3px rgba(46, 9, 54, 0.7), 0 0 65px 10px rgba(6, 25, 51, 0.5), 0 0 30px 7px rgba(5, 46, 33, 0.4);
 }
 
 .right-banka {

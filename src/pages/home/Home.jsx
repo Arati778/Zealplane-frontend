@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 import "./style.scss";
 
@@ -7,36 +7,43 @@ import Trending from "./trending/Trending";
 import Popular from "./popular/Popular";
 import TopRated from "./topRated/TopRated";
 import Recommended from "./Recommended/Recommended";
-import { useNavigate } from 'react-router-dom';
-import { setUserId } from '../../store/userAction'; // Import the action to set userId
-import { useDispatch } from 'react-redux'; // Import useDispatch hook
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import Header from '../../components/header/Header';
-import Curated from './curated/Curated';
-import Topics from './curated/Topics';
+import { useNavigate } from "react-router-dom";
+import { setUserId } from "../../store/userAction"; // Import the action to set userId
+import { useDispatch } from "react-redux"; // Import useDispatch hook
+import axios from "axios";
+import { useSelector } from "react-redux";
+import Header from "../../components/header/Header";
+import Curated from "./curated/Curated";
+import Topics from "./curated/Topics";
 
 const Home = () => {
-    
-const [userDetails, setUserDetails] = useState(null);
-const userIdRedux = useSelector((state) => state.user.userId); // Get userId from Redux store
-const userIdLocalStorage = localStorage.getItem('Id'); // Get userId from local storage
-const userId = userIdRedux || userIdLocalStorage; // Use userId from Redux if available, otherwise use local storage
-const navigate = useNavigate();
-const dispatch = useDispatch(); // Initialize useDispatch hook
-const [profilePic, setProfilePic] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const userIdRedux = useSelector((state) => state.user.userId); // Get userId from Redux store
+  const userIdLocalStorage = localStorage.getItem("Id"); // Get userId from local storage
+  const userId = userIdRedux || userIdLocalStorage; // Use userId from Redux if available, otherwise use local storage
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Initialize useDispatch hook
+  const [profilePic, setProfilePic] = useState(null);
+  const token = localStorage.getItem("token");
 
-    
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/users/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            },
+          }
+        );
+        console.log("your userid", userId);
         setUserDetails(response.data);
         setProfilePic(response.data.profilePic);
-        localStorage.setItem('username', response.data.username);
-        console.log('Username saved to local storage:', response.data);
+        localStorage.setItem("username", response.data.username);
+        console.log("Username saved to local storage:", response.data);
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error("Error fetching user details:", error);
       }
     };
 
@@ -55,19 +62,18 @@ const [profilePic, setProfilePic] = useState(null);
   //   return null;
   // }
 
-
-    return (
-        <div className="homePage">
-           <Header/>
-            <HeroBanner />
-            <Curated/>
-            {/* <Topics/>
+  return (
+    <div className="homePage">
+      <Header />
+      <HeroBanner />
+      <Curated />
+      {/* <Topics/>
             <Trending />
             <Popular />
             <TopRated />
             <Recommended/> */}
-        </div>
-    );
+    </div>
+  );
 };
 
 export default Home;

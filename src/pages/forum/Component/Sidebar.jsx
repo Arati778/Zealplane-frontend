@@ -1,30 +1,47 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaHome, FaFire, FaStar, FaSearch, FaTimes, FaBars } from 'react-icons/fa';
-import './Sidebar.scss';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FaHome, FaFire, FaStar } from "react-icons/fa";
+import "./Sidebar.scss";
+
+// Import the modal component
+import CreateCommunityModal from "./CommunityModal/CommunityModal";
+import axios from "axios"; // Import axios for API calls
 
 const Sidebar = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false); // To control modal visibility
+  const [communities, setCommunities] = useState([]); // State to store communities
+  const [error, setError] = useState(""); // To handle potential errors
 
-  const [isOpen, setIsOpen] = useState(false);
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  }
+  useEffect(() => {
+    // Fetch communities from the backend
+    const fetchCommunities = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/communities"
+        ); // Adjust the API endpoint if needed
+        setCommunities(response.data); // Assuming response.data is an array of communities
+      } catch (error) {
+        console.error("Error fetching communities:", error);
+        setError("Failed to load communities");
+      }
+    };
+
+    fetchCommunities();
+  }, []); // Empty dependency array to fetch once when the component mounts
 
   return (
-   <>
-      <div className="hamburger-menu" onClick={toggleSidebar}>
-          {isOpen? <FaTimes className='icon'/> : <FaBars className='icon'/>}
-      </div>
-
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+    
+    <div className="sidebar">
       <div className="sidebar-section">
-        {/* <div className="sidebar-header">
-          <FaSearch className="icon" />
-          <input type="text" placeholder="Search" />
-        </div> */}
         <Link to="/home" className="sidebar-link">
           <FaHome className="icon" /> Home
+        </Link>
+        <Link to="/forum" className="sidebar-link">
+          <FaHome className="icon" /> Forum
         </Link>
         <Link to="/popular" className="sidebar-link">
           <FaFire className="icon" /> Popular
@@ -33,23 +50,36 @@ const Sidebar = () => {
           <FaStar className="icon" /> Favorites
         </Link>
       </div>
+
       <div className="sidebar-section">
-        <h3>Subreddits</h3>
-        <Link to="/r/reactjs" className="sidebar-link">
-          r/reactjs
-        </Link>
-        <Link to="/r/javascript" className="sidebar-link">
-          r/javascript
-        </Link>
-        <Link to="/r/webdev" className="sidebar-link">
-          r/webdev
-        </Link>
-        <Link to="/r/programming" className="sidebar-link">
-          r/programming
-        </Link>
+        <h3>Communities</h3>
+        {/* Check if there was an error fetching communities */}
+        {error && <p className="error-message">{error}</p>}
+
+        {/* Map over communities and display them dynamically */}
+        {communities.length > 0 ? (
+          communities.map((community) => (
+            <Link
+              to={`/r/${community.name}`}
+              className="sidebar-link"
+              key={community._id}
+            >
+              r/{community.name}
+            </Link>
+          ))
+        ) : (
+          <p>Loading communities...</p>
+        )}
       </div>
+
+      {/* Add the Create Community button */}
+      <div className="create-community-btn">
+        <button onClick={toggleModal}>Create Community</button>
+      </div>
+
+      {/* Modal to create a community */}
+      {isModalOpen && <CreateCommunityModal closeModal={toggleModal} />}
     </div>
-    </>
   );
 };
 

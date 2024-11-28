@@ -9,23 +9,24 @@ import "./avatar.scss";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { colors } from "@mui/material";
+import axiosInstance from "../../Auth/Axios";
 
 Modal.setAppElement("#root");
 
 const ProfileCard = () => {
-  const user = useSelector((state) => state.user.user);
   const userIdRedux = useSelector((state) => state.user.userId);
   const userIdLocalStorage = localStorage.getItem("Id");
   const userId = userIdRedux || userIdLocalStorage;
   const dispatch = useDispatch();
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const [status, setStatus] = useState("");
+
   const [data, setData] = useState({
-    username: "Krishna",
-    jobRole: "FullStack Developer",
-    description: "This is demo description",
+    username: "",
+    jobRole: "",
+    description: "",
     location: "",
     fullName: "",
+    status: "", // Add status here
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,29 +37,24 @@ const ProfileCard = () => {
   });
   const { id } = useParams();
 
-  // Determine if the current user is viewing their own profile
-  const isOwner = id === userId;
-  // console.log("userId", userId);
-  // console.log("id", id);
-
   useEffect(() => {
-    // Fetch user data from backend API
     const fetchUserData = async () => {
       try {
-        // Use 'id' from URL if present; otherwise, use 'userId'
         const userIdToFetch = id || userId;
-        const response = await axios.get(
-          `${apiBaseUrl}/users/${userIdToFetch}`
-        );
+        const response = await axiosInstance.get(`users/${userIdToFetch}`);
         console.log("User data is:", response.data);
-        const { fullName, description, jobRole, location } = response.data;
-        setData((prevData) => ({
-          ...prevData,
-          fullName: fullName || "Enter Your Name",
-          description: description || "Enter Your Description",
-          jobRole: jobRole || "Enter Job Role",
-          location: location || "Your location",
-        }));
+
+        const { fullName, description, jobRole, location, status } =
+          response.data.user;
+        setStatus(response.data);
+
+        setData({
+          fullName: fullName || "Enter Your Fullname",
+          description: description || "Your Description!",
+          jobRole: jobRole || "Your Profession",
+          location: location || "Your Location",
+        });
+
         setFormData({
           fullname: fullName || "",
           jobRole: jobRole || "",
@@ -97,14 +93,25 @@ const ProfileCard = () => {
 
   const handleSaveButtonClick = async () => {
     try {
-      const response = await axios.put(`${apiBaseUrl}/users/${userId}`, {
-        fullName: formData.fullname,
-        jobRole: formData.jobRole,
-        location: formData.location,
-        description: formData.description,
-      });
+      const token = localStorage.getItem("token");
+
+      const response = await axiosInstance.put(
+        `/users/${userId}`,
+        {
+          fullName: formData.fullname,
+          jobRole: formData.jobRole,
+          location: formData.location,
+          description: formData.description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       console.log("User data updated:", response.data);
-      toast.success("Your description updated succesfully!");
+      toast.success("Your description updated successfully!");
       setData({
         ...data,
         fullName: formData.fullname,
@@ -115,7 +122,7 @@ const ProfileCard = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating user data:", error);
-      toast.error("description update failed! please try again");
+      toast.error("Description update failed! Please try again.");
     }
   };
 
@@ -140,17 +147,6 @@ const ProfileCard = () => {
     },
   };
 
-  const responsiveStyles = () => {
-    if (window.innerWidth <= 768) {
-      customStyles.content.width = "80%";
-      customStyles.content.height = "auto";
-      customStyles.content.padding = "10px";
-    }
-  };
-
-  responsiveStyles();
-  window.addEventListener("resize", responsiveStyles);
-
   return (
     <div className="col mb-3" style={{ marginTop: "10px" }}>
       <ToastContainer />
@@ -167,18 +163,13 @@ const ProfileCard = () => {
           }}
         >
           {/* Conditionally render the Edit button */}
-          {isOwner && (
+          {status.status !== "visitor" && (
             <Button className="Edit" onClick={handleEditClick}>
               <FaEdit />
             </Button>
           )}
           <h4>{data.fullName}</h4>
-          <h5 style={{ color: "#34aadc" }}>
-            {/* <strong>Artist</strong> // <strong>Writer</strong> //{" "} */}
-            {data.jobRole}
-            {/* <strong>Enter Your Profile</strong> //  */}
-          </h5>
-
+          <h5 style={{ color: "#34aadc" }}>{data.jobRole}</h5>
           <h7 style={{ color: "#ced4da" }}>{data.location}</h7>
           <br />
           <h5 style={{ fontWeight: "200" }}>About</h5>
@@ -256,25 +247,13 @@ const ProfileCard = () => {
             style={{ marginBottom: "5px", width: "100%" }}
           />
           <br />
-
-          <h5>Your birth date?</h5>
-          <input
-            type="text"
-            name="dob"
-            value={formData.dob}
-            placeholder="About Your date of birth"
-            onChange={handleInputChange}
-            style={{ marginBottom: "5px", width: "100%" }}
-          />
-          <span>
-            <Button
-              type="primary"
-              onClick={handleSaveButtonClick}
-              style={{ width: "60px" }}
-            >
-              Save
-            </Button>
-          </span>
+          <Button
+            type="primary"
+            onClick={handleSaveButtonClick}
+            style={{ width: "60px" }}
+          >
+            Save
+          </Button>
         </div>
       </Modal>
     </div>

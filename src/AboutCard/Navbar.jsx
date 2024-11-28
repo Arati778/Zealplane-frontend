@@ -18,7 +18,10 @@ const Navbar = () => {
   return (
     <div className="nav-top">
       <div className="logo-img">
-        <img src={logozp} alt="ZealPlane Logo" className="logo-img" /><span style={{color:"red", fontWeight:"900",fontSize:"19px"}}>ZEALPLANE</span>
+        <img src={logozp} alt="ZealPlane Logo" className="logo-img" />
+        <span style={{ color: "red", fontWeight: "900", fontSize: "19px" }}>
+          ZEALPLANE
+        </span>
       </div>
       <div className="nav-menu">
         <button onClick={handleLoginClick}>Log in</button>

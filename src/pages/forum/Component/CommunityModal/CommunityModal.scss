@@ -1,0 +1,113 @@
+/* Modal Overlay */
+.create-community-modal__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.create-community-modal__content {
+    background-color: #2f2f2f; /* Darker background to match Reddit */
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    color: #fff; /* White text to contrast with the dark background */
+}
+
+/* Close Button */
+.create-community-modal__close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Heading */
+.create-community-modal__title {
+    font-size: 22px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #ff4500; /* Reddit orange color for the heading */
+}
+
+/* Input and Textarea */
+.create-community-modal__input,
+.create-community-modal__textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #444; /* Slightly darker border */
+    background-color: #333; /* Darker input background */
+    color: #fff; /* White text */
+    font-size: 14px;
+}
+
+.create-community-modal__input:focus,
+.create-community-modal__textarea:focus {
+    outline: none;
+    border: 1px solid #ff4500; /* Reddit orange border on focus */
+}
+
+/* Submit Button */
+.create-community-modal__submit-btn {
+    background-color: #ff4500; /* Reddit red/orange for button */
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.create-community-modal__submit-btn:hover {
+    background-color: #d74100; /* Darker red on hover */
+}
+
+.create-community-modal__submit-btn:focus {
+    outline: none;
+}
+
+/* Form Layout */
+.create-community-modal__form {
+    display: flex;
+    flex-direction: column;
+}
+.create-community-modal__submit-btn {
+    background-color: #ff4500; /* Reddit red/orange for button */
+    color: white;
+    padding: 14px 20px; /* Increased padding for better balance */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+    text-align: center; /* Center text inside the button */
+    font-weight: bold; /* Make the text bold for emphasis */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover and focus effects */
+}
+
+.create-community-modal__submit-btn:hover {
+    background-color: #d74100; /* Darker red on hover */
+    transform: scale(1.05); /* Slightly enlarge button on hover for better interactivity */
+}
+
+.create-community-modal__submit-btn:focus {
+    outline: none;
+    border: 1px solid #ff4500; /* Border color for focus */
+}

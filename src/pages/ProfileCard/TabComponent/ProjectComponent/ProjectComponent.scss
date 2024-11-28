@@ -36,7 +36,7 @@
   
   // Modal custom styling
   .MuiDialog-paper {
-    background-color: #303030 !important; // Darker modal background for better contrast
+  //   background-color: #303030 !important;
     color: #ffffff !important; // Light text inside the modal
     border-radius: 12px; // Rounded corners
     margin: 20px; // Added margin between dialog boxes
@@ -80,11 +80,12 @@
   
   input[type="file"] {
     color: #ffffff;
+    background-color: #fff;
   }
   
   // Additional padding for dialogs
-  .MuiDialogContent-root {
-    padding: 20px !important; // Ensures more space inside modal content
-  }
+  // .MuiDialogContent-root {
+  //   padding: 20px !important; // Ensures more space inside modal content
+  // }
   
   

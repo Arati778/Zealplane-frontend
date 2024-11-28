@@ -1,128 +1,147 @@
+// src/components/ProjectComponent/ProjectComponent.jsx
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Card,
-  Typography,
-  FormControl,
-  MenuItem,
-  Select,
-  InputLabel,
-  Chip,
-  CircularProgress,
-  IconButton,
-  Box,
-} from "@mui/material";
-// import CloseIcon from "@mui/icons-material/Close";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Button, Card, Typography, CircularProgress, Box } from "@mui/material";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import ProjectModal from "./Others/projectModal"; // Import the new modal
+import ContentWrapper from "../../../../components/contentWrapper/ContentWrapper";
 import Img from "../../../../components/lazyLoadImage/Img";
 import "./ProjectComponent.scss";
-import { useSelector } from "react-redux";
-import ContentWrapper from "../../../../components/contentWrapper/ContentWrapper";
-import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
+import axiosInstance from "../../../../Auth/Axios";
+import { jwtDecode } from "jwt-decode";
 
 const ProjectComponent = () => {
-  const [open, setOpen] = useState(false);
-  const userIdRedux = useSelector((state) => state.user.userId);
-  const userIdLocalStorage = localStorage.getItem("Id");
-  const userId = userIdRedux || userIdLocalStorage;
-  const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    thumbnailImage: "",
-    category: "",
-    thumbnailLink: [],
-    tags: [],
-    username: localStorage.getItem("username"),
-    id: generateUniqueId(),
-  });
-
   const [submittedData, setSubmittedData] = useState([]);
   const [loading, setLoading] = useState(false); // Loading state
   const [uploading, setUploading] = useState(false); // Uploading state for progress
   const [error, setError] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [fetchedUsername, setFetchedUsername] = useState("");
-  
+
   const { id } = useParams();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const isOwner = id === userId;
   const navigate = useNavigate();
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const userIdRedux = useSelector((state) => state.user.userId);
+  const userIdLocalStorage = localStorage.getItem("Id");
+  const userId = userIdRedux || userIdLocalStorage;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
+  const isOwner = id === userId;
+  const [modalOpen, setModalOpen] = useState(false);
+  const token = localStorage.getItem("token");
+  const [status, setStatus] = useState("");
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  const handleOpen = () => setModalOpen(true);
+  const handleClose = () => setModalOpen(false);
 
-  const handleSubmit = async () => {
-    try {
-      setUploading(true); // Set uploading state to true
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("description", formData.description);
-      data.append("category", formData.category);
-      data.append("tags", formData.tags.join(","));
-      data.append("username", formData.username);
-      data.append("id", formData.id);
+  const handleSubmit = (formData) => {
+    setUploading(true);
 
-      if (selectedFile) {
-        data.append("thumbnailImage", selectedFile);
-      }
+    // Get token from localStorage
+    const token = localStorage.getItem("token");
 
-      const response = await axios.post(
-        `${apiBaseUrl}/projects`,
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+    if (token) {
+      try {
+        // Decode the JWT token
+        const decodedToken = jwtDecode(token);
+
+        // Extract uniqueId from the decoded token
+        const uniqueId = decodedToken?.uniqueId;
+        const profilePic = decodedToken?.profilePic;
+
+        if (!uniqueId) {
+          console.error("uniqueId is missing or invalid from the token.");
+          setUploading(false);
+          return;
         }
-      );
 
-      setSubmittedData([...submittedData, response.data]);
-      setUploading(false); // Reset uploading state
-      handleClose();
-      setFormData({
-        name: "",
-        description: "",
-        id: generateUniqueId(),
-        thumbnailImage: [],
-        category: "",
-        tags: [],
-        username: localStorage.getItem("username"),
-      });
+        console.log("Extracted uniqueId:", uniqueId);
+        console.log("Extracted profilePic:", profilePic);
 
-      navigate(`/details/${response.data.projectId}`);
-    } catch (error) {
-      console.error("Error posting form data:", error);
-      setUploading(false); // Reset uploading state on error
+        // Create FormData and append fields
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("description", formData.description);
+        data.append("category", formData.category);
+        data.append("tags", formData.tags.join(","));
+        data.append("username", formData.username);
+        data.append("id", formData.id);
+        data.append("uniqueId", uniqueId);
+        data.append("profilePic", profilePic);
+
+        console.log();
+
+        if (formData.thumbnailImage) {
+          data.append("thumbnailImage", formData.thumbnailImage);
+        }
+
+        // Make POST request
+        axiosInstance
+          .post(`${apiBaseUrl}/projects`, data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            setSubmittedData((prevData) => [...prevData, response.data]);
+            setUploading(false);
+            handleClose();
+            navigate(`/details/${response.data.projectId}`);
+          })
+          .catch((error) => {
+            console.error("Error posting form data:", error);
+            setUploading(false);
+          });
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        setUploading(false);
+      }
+    } else {
+      console.error("Token is missing!");
+      setUploading(false);
     }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (fetchedUsername) {
+        const response = await axios.get(
+          `${apiBaseUrl}/projects/username/${fetchedUsername}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("projects fetched by username", response.data);
+
+        setSubmittedData(response.data);
+      } else {
+        setSubmittedData([]);
+        console.error("error fetching your project");
+      }
+    } catch (error) {
+      console.log("Please upload your project here");
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/users/${id}`);
-        if (response.data.username) {
-          setFetchedUsername(response.data.username);
-          localStorage.setItem("username", response.data.username);
+        const response = await axiosInstance.get(`/users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.data.user.username) {
+          setFetchedUsername(response.data.user.username);
+          setStatus(response.data.status);
+          console.log("username for the project is", fetchedUsername);
+
+          localStorage.setItem("username", response.data.user.username);
         } else {
           setFetchedUsername("");
         }
@@ -135,128 +154,36 @@ const ProjectComponent = () => {
     fetchUserDetails();
   }, [id]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      if (fetchedUsername) {
-        const response = await axios.get(`${apiBaseUrl}/projects/username/${fetchedUsername}`);
-        setSubmittedData(response.data);
-      } else {
-        setSubmittedData([]);
-      }
-    } catch (error) {
-      console.log("Please upload your project here");
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (fetchedUsername) {
       fetchData();
     }
   }, [fetchedUsername]);
 
-  const categories = [
-    { value: "Artworks", label: "Artworks" },
-    { value: "Books", label: "Books" },
-    { value: "Comics", label: "Comics" },
-    { value: "Fan Art", label: "Fan Art" },
-  ];
-
-  useEffect(() => {
-    if (submittedData) {
-      console.log(submittedData);
-    }
-  }, [submittedData]);
-
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          Add Comic Project
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            style={{ position: "absolute", right: 8, top: 8 }}
-          >
-            {/* <CloseIcon /> */}
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="projectName"
-            name="name"
-            label="Project Name"
-            type="text"
-            fullWidth
-            value={formData.name}
-            onChange={handleChange}
-            required
-            error={!formData.name}
-            helperText={!formData.name && "Project Name is required"}
-            sx={{ marginBottom: 2 }} // Add space between fields
-          />
-          <TextField
-            margin="dense"
-            id="projectDescription"
-            name="description"
-            label="Project Description"
-            type="text"
-            fullWidth
-            multiline
-            rows={4}
-            value={formData.description}
-            onChange={handleChange}
-            sx={{ marginBottom: 2 }} // Add space between fields
-          />
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel id="category-label">Category</InputLabel>
-            <Select
-              labelId="category-label"
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              {categories.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <input type="file" onChange={handleFileChange} accept="image/*" style={{ marginBottom: 16 }} />
-          <ContentWrapper>
-            <div>
-              {formData.thumbnailImage &&
-                formData.thumbnailImage.map((thumbnail, index) => (
-                  <Img
-                    key={index}
-                    src={thumbnail}
-                    alt={`Thumbnail ${index}`}
-                    style={{ width: "100px", height: "100px", margin: "5px" }}
-                  />
-                ))}
-            </div>
-          </ContentWrapper>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>Submit</Button>
-        </DialogActions>
-      </Dialog>
+      <ProjectModal
+        open={modalOpen}
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+      />
 
       {loading && <p>Loading...</p>}
       {uploading && (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", margin: "20px 0" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            margin: "20px 0",
+          }}
+        >
           <CircularProgress />
         </Box>
       )}
       {error && <p>Error: {error.message}</p>}
 
-<div className="project-cards-container">
+      <div className="project-cards-container">
         {submittedData && submittedData.length > 0 ? (
           submittedData.map((project, index) => (
             <Card
@@ -301,7 +228,7 @@ const ProjectComponent = () => {
           <p>No projects found.</p>
         )}
       </div>
-{isOwner && (
+      {status !== "visitor" && (
         <Button variant="contained" onClick={handleOpen}>
           Add Project
         </Button>

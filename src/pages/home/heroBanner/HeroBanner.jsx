@@ -53,15 +53,26 @@ const HeroBanner = ({ selectedPosterUrl }) => {
   const { url } = useSelector((state) => state.home);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
+  // Shuffle the array to show projects randomly
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const res = await axios.get(`${apiBaseUrl}/projects`);
+        console.log("response projects are:", res.data);
+
         const validProjects = res.data.filter(
           (project) =>
             project.thumbnailImage && project.thumbnailImages.length > 0
         );
-        setDatas(validProjects);
+        setDatas(shuffleArray(validProjects)); // Shuffle the projects
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
@@ -102,13 +113,25 @@ const HeroBanner = ({ selectedPosterUrl }) => {
             style={{
               "--swiper-navigation-color": "#fff",
               "--swiper-pagination-color": "#fff",
-              width: "1050px",
-              height: "550px",
             }}
             autoplay={{ delay: 5500, disableOnInteraction: false }}
-            pagination={{ clickable: true }}
+            pagination={{ clickable: true, dynamicBullets: true }}
             navigation={true}
             modules={[Autoplay, Pagination, Navigation]}
+            breakpoints={{
+              640: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              768: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 1,
+                spaceBetween: 30,
+              },
+            }}
           >
             {datas.map((project) => (
               <SwiperSlide key={project.projectId}>
@@ -117,41 +140,41 @@ const HeroBanner = ({ selectedPosterUrl }) => {
                     <img src={project.thumbnailImage} alt={project.name} />
                   </div>
 
-                  <div className="hoverContent">
-                    <div className="titleDescriptionContainer">
-                      <div className="title">{project.name}</div>
-                      <TruncatedDescription
-                        description={project.description}
-                        maxLength={100}
-                      />
-                    </div>
-                    <div className="userInfo">
-    <img
-      className="profilePicture"
-      src={project.profilePic} // Assuming the field is profilePicture
-      alt={project.username}
-    />
-    <span className="username">{project.username}</span>
-  </div>
+                  {/* Title and Description in a separate div */}
+                  <div className="titleDescriptionWrapper">
+                    <div className="title">{project.name}</div>
+                    <TruncatedDescription
+                      description={project.description}
+                      maxLength={window.innerWidth <= 768 ? 25 : 100}
+                    />
+                  </div>
 
-                    <div className="iconsContainer">
-                      <div className="icons">
-                        <MdThumbUp
-                          className="icon"
-                          style={{
-                            color: project.isLiked ? "blue" : "white",
-                          }}
-                          onClick={() => handleLikeClick(project.projectId)}
-                        />
-                        <span className="likeCount">
-                          {project.likes}{" "}
-                          {project.likes === 1 ? "Like" : "Likes"}
-                        </span>
-                        <MdShare
-                          className="icon"
-                          onClick={() => handleShareClick(project)}
-                        />
-                      </div>
+                  {/* Static Content with User Info and Icons */}
+                  <div className="staticContent">
+                    <div className="userInfo">
+                      <img
+                        className="profilePicture"
+                        src={project.profilePic}
+                        alt={project.username}
+                      />
+                      <span className="username">{project.username}</span>
+                    </div>
+
+                    <div className="icons">
+                      <MdThumbUp
+                        className="icon"
+                        style={{
+                          color: project.isLiked ? "blue" : "white",
+                        }}
+                        onClick={() => handleLikeClick(project.projectId)}
+                      />
+                      <span className="likeCount">
+                        {project.likes} {project.likes === 1 ? "Like" : "Likes"}
+                      </span>
+                      <MdShare
+                        className="icon"
+                        onClick={() => handleShareClick(project)}
+                      />
                     </div>
                   </div>
                 </div>

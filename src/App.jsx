@@ -27,52 +27,53 @@ import ForgotPassword from "./pages/credentials/ForgotPassword";
 import PostDetail from "./pages/forum/PostDetail";
 import CreatePost from "./pages/forum/CreatePost";
 import { io } from "socket.io-client";
+import Viewer from "./pages/ProfileCard/TabComponent/ProjectComponent/DetailsPage/Viewer";
 
 function App() {
-    const dispatch = useDispatch();
-    const userIdLocalStorage = localStorage.getItem('Id'); 
-    const userId = userIdLocalStorage;
-    const { url } = useSelector((state) => state.home);
-    console.log(url);
-    
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
-        localStorage.setItem('username', response.data.username);
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    };
+  const dispatch = useDispatch();
+  const userIdLocalStorage = localStorage.getItem("Id");
+  const userId = userIdLocalStorage;
+  const { url } = useSelector((state) => state.home);
+  console.log(url);
 
-    fetchUserDetails();
-  }, [userId]);
+  // useEffect(() => {
+  //   const fetchUserDetails = async () => {
+  //     try {
+  //       const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+  //       localStorage.setItem('username', response.data.username);
+  //     } catch (error) {
+  //       console.error('Error fetching user details:', error);
+  //     }
+  //   };
 
+  //   fetchUserDetails();
+  // }, [userId]);
 
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/home/notification" element={<Notification />} />
-                <Route path="/details/:projectId" element={<DetailsPage />}/>
-                <Route path="/home/:id" element={<DemoProjectPage />} />
-                <Route path="/register" element={<RegisterComponent />} />
-                <Route path="/forgot-password" element={<ForgotPassword/>} />
-                <Route path="/login" element={<LoginComponent/>} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/forum" element={<ForumHome/>} />
-                <Route path="/post/:id" element={<PostDetail/>} />
-                <Route path="/forum/create-post" element={<CreatePost />} />
-                <Route path="/profile/:id" element={<AvatarComponent/>}/>
-                <Route path="/p" element={<MyComponent/>} />
-                <Route path="/:mediaType/:id" element={<Details />} />
-                <Route path="/search/:query" element={<SearchResult />} />
-                <Route path="/explore/:mediaType" element={<Explore />} />
-                <Route path="*" element={<PageNotFound />} />
-            </Routes>
-            {/* <Footer /> */}
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/viewer" element={<Viewer />} />
+        <Route path="/home/notification" element={<Notification />} />
+        <Route path="/details/:projectId" element={<DetailsPage />} />
+        <Route path="/home/:id" element={<DemoProjectPage />} />
+        <Route path="/register" element={<RegisterComponent />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/login" element={<LoginComponent />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/forum" element={<ForumHome />} />
+        <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="/forum/create-post" element={<CreatePost />} />
+        <Route path="/profile/:id" element={<AvatarComponent />} />
+        <Route path="/p" element={<MyComponent />} />
+        <Route path="/:mediaType/:id" element={<Details />} />
+        <Route path="/search/:query" element={<SearchResult />} />
+        <Route path="/explore/:mediaType" element={<Explore />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+      {/* <Footer /> */}
+    </BrowserRouter>
+  );
 }
 
 export default App;

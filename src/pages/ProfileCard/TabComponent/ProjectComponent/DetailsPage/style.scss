@@ -15,7 +15,7 @@
 
 
 
-.content {
+.content1 {
   display: flex;
   position: relative;
   // flex-direction: column;
@@ -23,29 +23,28 @@
  
   overflow: hidden;
 
-  .left {
+  .left1 {
     flex-shrink: 0;
     position: relative;
     overflow: hidden;
     width: fit-content;
 
     .posterImg {
-      width: 1200px;
       display: block;
       border-radius: 12px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
   }
 
-  .right {
-    width: 480px; /* Fixed width */
+  .right1 {
+    width: 55vh; /* Fixed width */
     height: 100%; /* Full height of the viewport */
     overflow-y: auto; /* Allow scrolling if content overflows */
     background-color: #1c1c1c; /* Dark background for a DeviantArt-like appearance */
     padding: 18px; /* Add padding for spacing */
     box-sizing: border-box;
     position: fixed; /* Fixed position relative to the viewport */
-    top: 0; /* Align to the top of the viewport */
+    top: 60px; /* Align to the top of the viewport */
     right: 0; /* Align to the right of the viewport */
     color: #e0e0e0; /* Light text color for contrast against dark background */
   }
@@ -56,7 +55,6 @@
   }
   
   .row-layout {
-    margin-top: 40px;
     flex-direction: row; /* Arrange items in a row */
   }
   
@@ -71,14 +69,12 @@
     overflow: hidden; /* Ensure content stays within boundaries */
     width: calc(50% - 20px); /* Adjust width for row layout */
     transition: transform 0.3s ease, box-shadow 0.2s ease;
-    /* For column layout, you can adjust the width as needed */
   }
-
-.project-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Add a shadow effect on hover */
-}
-
+  
+  .project-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Add a shadow effect on hover */
+  }
   
   .project-image {
     width: 100%; /* Full width of the container */
@@ -109,64 +105,108 @@
     opacity: 1; /* Show content on hover */
   }
   
-  
   .project-content h4 {
     margin: 0 0 10px;
     font-size: 13px;
-    line-height: 1.5; 
+    line-height: 1.5;
     color: white;
     font-weight: 600;
-    // transition: transform 0.3s ease; 
   }
   
   .project-content p {
     margin: 0;
     font-size: 15px;
   }
-}   .avatarContainer2 {
-  position: absolute;
-  bottom: 10px; /* Position it near the bottom */
-  left: 10px;   /* Position it near the left */
-  display: flex;
-  align-items: center;
-  // transition: transform 0.3s ease; 
-}
-// .project-item:hover .avatarContainer2 {
-//   transform: scale(1.05); /* Slight zoom in on hover */
-// }
-.profileIcon2 img {
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  margin-right: 5px; /* Add space between the image and the text */
-}
-
-.profileIcon2 span {
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  white-space: nowrap;
-}
-.iconsContainer2 {
-  position: absolute;
-  bottom: 10px;
-  right: 10px; /* Align icons to the bottom right */
-  display: flex;
-   flex-direction: column;
-  gap: 6px;
-  // transform: scale(1.05);
-
-  .icons2 {
   
-
+  .avatarContainer2 {
+    position: absolute;
+    bottom: 10px; /* Position it near the bottom */
+    left: 10px;   /* Position it near the left */
+    display: flex;
+    align-items: center;
+  }
+  
+  .profileIcon2 img {
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    margin-right: 5px; /* Add space between the image and the text */
+  }
+  
+  .profileIcon2 span {
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  .iconsContainer2 {
+    position: absolute;
+    bottom: 10px;
+    right: 10px; /* Align icons to the bottom right */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .icons2 {
     margin-left: 120px;
-   
+  
     .icon {
       color: #fff;
       font-size: 14px;
     }
   }
-}
+  
+  /* Media Queries for responsive design */
+  @media (max-width: 768px) {
+    .project-item {
+      width: calc(100% - 20px); /* Full width for smaller screens */
+    }
+  
+    .avatarContainer2 {
+      bottom: 5px; /* Adjust position for smaller screens */
+      left: 5px;   /* Adjust position for smaller screens */
+    }
+  
+    .iconsContainer2 {
+      bottom: 5px;
+      right: 5px; /* Adjust for smaller screens */
+      flex-direction: row; /* Display icons in a row for better fit */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .project-item {
+      width: calc(100% - 20px); /* Full width for very small screens */
+    }
+  
+    .project-image {
+      height: 120px; /* Adjust height for small screens */
+    }
+  
+    .project-content h4 {
+      font-size: 12px; /* Smaller font size for small screens */
+    }
+  
+    .project-content p {
+      font-size: 14px; /* Smaller font size for small screens */
+    }
+  
+    .profileIcon2 img {
+      width: 20px;
+      height: 20px; /* Adjust icon size for small screens */
+    }
+  
+    .profileIcon2 span {
+      font-size: 9px; /* Adjust text size for small screens */
+    }
+  
+    .iconsContainer2 {
+      gap: 4px; /* Reduce gap for small screens */
+    }
+  }
+}  
 // style.scss
 
 @keyframes scrollUp {
@@ -264,6 +304,7 @@
   }
 }
 
+
 .User-Profile {
   display: flex;
   align-items: center;
@@ -331,8 +372,8 @@
 
 // swiperStyles.scss
 .mySwiper {
-  width: 850px;
-  height: 520px; // Decrease height as needed for main Swiper container
+  width: 60vw;
+  height: 65vh; // Decrease height as needed for main Swiper container
   overflow: auto;
   margin-left: 0;
 
@@ -381,6 +422,7 @@
 
 }
 
+// thumbanil
 .mySwiper-thumbs {
   height: 85px; /* Try setting a fixed height */
 
@@ -562,7 +604,7 @@
 }
 .description1 {
   color: rgb(219, 218, 218);
-
+  margin-top: 30px;
   font-size: 17px;
   width: 70%;
   letter-spacing: 0.6px;
@@ -574,3 +616,61 @@
   }
 }
 
+.project-description{
+  border-radius: 3px;
+  padding: 5px;
+  text-decoration: none;
+  width: 350px;
+}
+
+@media (max-width: 768px) {
+  .content1 {
+    flex-direction: column;
+  }
+
+  .left1,
+  .right1 {
+    min-width: 100%;
+    margin-bottom: 20px; /* Add spacing between sections */
+  }
+
+  .project-item {
+    width: 100%; /* Full width for project items */
+  }
+
+  .project-content h4 {
+    font-size: 12px; /* Adjust font size */
+  }
+}
+
+/* Media Query for Tablet Screens */
+@media (max-width: 1024px) {
+  .content1 {
+    flex-direction: column;
+  }
+
+  .project-item {
+    width: 48%; /* Two columns */
+  }
+}
+
+/* Media Query for Desktop Screens */
+@media (min-width: 1025px) {
+  .content1 {
+    flex-direction: row;
+  }
+
+  .left1 {
+    flex: 2;
+  }
+
+  .right1 {
+    flex: 1;
+    position: sticky; /* Sticky position for desktop */
+    top: 60px;
+  }
+
+  .project-item {
+    width: calc(33.33% - 20px); /* Three columns */
+  }
+}
