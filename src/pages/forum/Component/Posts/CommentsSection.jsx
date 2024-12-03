@@ -7,10 +7,13 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
   const [newComment, setNewComment] = useState("");
   const token = localStorage.getItem("token");
 
+  // Limit unique commenters to 5
   const uniqueCommenters = Array.isArray(comments)
     ? Array.from(
         new Set(comments.map((comment) => comment.author || "Anonymous"))
-      ).map((author) => comments.find((comment) => comment.author === author))
+      )
+        .map((author) => comments.find((comment) => comment.author === author))
+        .slice(0, 5) // Limit to 5
     : [];
 
   const generateCommentSummary = () => {
@@ -32,6 +35,7 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
   };
 
   const handleCommentSubmit = async (event) => {
+    event.preventDefault();
     if (!postId || !token) {
       console.error("Missing postId or token");
       return;
@@ -60,6 +64,7 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
     <div className="comments-section">
       <h3>Comments</h3>
 
+      {/* Profile Picture Group */}
       <div className="profile-pic-group">
         {uniqueCommenters.map((commenter, index) => (
           <img
@@ -71,8 +76,24 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
         ))}
       </div>
 
+      {/* Comment Summary */}
       <div className="comment-summary">{generateCommentSummary()}</div>
 
+      {/* Comment Form */}
+      <form onSubmit={handleCommentSubmit} className="comment-form">
+        <textarea
+          value={newComment}
+          onChange={handleCommentChange}
+          placeholder="Add a comment..."
+          required
+          className="comment-input"
+        />
+        <button type="submit" className="submit-button">
+          Post Comment
+        </button>
+      </form>
+
+      {/* Comments */}
       {Array.isArray(comments) && comments.length > 0 ? (
         comments.map(
           (comment) =>
@@ -98,8 +119,8 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
                 </div>
                 <p className="comment-body">{comment.body}</p>
                 <div className="comment-actions">
-                  <button className="like-button">Like</button>
-                  <button className="reply-button">Reply</button>
+                  {/* <button className="like-button">Like</button>
+                  <button className="reply-button">Reply</button> */}
                 </div>
               </div>
             )
@@ -107,19 +128,6 @@ const CommentsSection = ({ comments = [], setComments, postId }) => {
       ) : (
         <p>No comments yet.</p>
       )}
-
-      <form onSubmit={handleCommentSubmit} className="comment-form">
-        <textarea
-          value={newComment}
-          onChange={handleCommentChange}
-          placeholder="Add a comment..."
-          required
-          className="comment-input"
-        />
-        <button type="submit" className="submit-button">
-          Post Comment
-        </button>
-      </form>
     </div>
   );
 };

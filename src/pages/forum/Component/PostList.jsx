@@ -43,7 +43,13 @@ const PostList = ({ posts }) => {
                 <img src={post.image} alt="Post" className="post-image" />
               </div>
             )}
-            <p className="post-body">{post.body || "No content available"}</p>
+            <p
+              className="post-body"
+              dangerouslySetInnerHTML={{
+                __html: post.body || "No content available",
+              }}
+              style={{ whiteSpace: "pre-wrap" }}
+            ></p>
 
             <div className="post-meta">
               <span className="post-likes">

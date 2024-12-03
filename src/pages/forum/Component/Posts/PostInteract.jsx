@@ -9,10 +9,27 @@ const PostInteractions = ({
   handleVote,
   commentCount,
   votesCount,
+  hasVoted,
 }) => {
+  // Function to handle share functionality
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: post.title,
+          text: post.body,
+          url: window.location.href, // You can customize the URL you want to share
+        })
+        .then(() => console.log("Shared successfully"))
+        .catch((error) => console.error("Error sharing:", error));
+    } else {
+      // Fallback for browsers that do not support the share API
+      alert("Your browser does not support the share feature.");
+    }
+  };
+
   return (
     <div className="post-votes">
-      {/* Upvote Button */}
       <button
         className={`vote-button upvote ${
           userVote === "upvote" ? "active" : ""
@@ -28,16 +45,6 @@ const PostInteractions = ({
         {votesCount}
       </span>
 
-      {/* Downvote Button */}
-      {/* <button
-        className={`vote-button downvote ${
-          userVote === "downvote" ? "active" : ""
-        }`}
-        onClick={() => handleVote("downvote")} // Trigger handleVote with 'downvote' voteType
-      >
-        <BiDownvote />
-      </button> */}
-
       {/* Comment Button */}
       <button className="vote-button comment">
         <FaRegCommentAlt />
@@ -45,7 +52,7 @@ const PostInteractions = ({
       </button>
 
       {/* Share Button */}
-      <button className="vote-button share">
+      <button className="vote-button share" onClick={handleShare}>
         <RiShareForwardLine />
       </button>
     </div>

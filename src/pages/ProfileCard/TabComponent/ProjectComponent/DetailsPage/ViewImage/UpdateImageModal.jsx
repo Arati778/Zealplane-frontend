@@ -1,20 +1,27 @@
 import React, { useState } from "react";
-import { Modal, Box, Button, Typography, Grid, CircularProgress } from "@mui/material";
-import { toast } from 'react-toastify';
-import { faUpload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  Modal,
+  Box,
+  Button,
+  Typography,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
+import { toast } from "react-toastify";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
-  borderRadius: '10px',
+  borderRadius: "10px",
 };
 
 const UpdateImageModal = ({ open, handleClose, projectId, apiBaseUrl }) => {
@@ -26,7 +33,7 @@ const UpdateImageModal = ({ open, handleClose, projectId, apiBaseUrl }) => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
 
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setThumbnailImage(file);
 
       // Preview the image
@@ -54,8 +61,9 @@ const UpdateImageModal = ({ open, handleClose, projectId, apiBaseUrl }) => {
 
     try {
       const updateResponse = await axios.post(
-        `${apiBaseUrl}/projects/id/${projectId}`, 
-        formData, {
+        `${apiBaseUrl}/projects/id/${projectId}`,
+        formData,
+        {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -108,7 +116,12 @@ const UpdateImageModal = ({ open, handleClose, projectId, apiBaseUrl }) => {
           </div>
         )}
 
-        <Grid container spacing={2} justifyContent="center" style={{ marginTop: "20px" }}>
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          style={{ marginTop: "20px" }}
+        >
           <Grid item>
             <Button
               variant="contained"
@@ -117,7 +130,11 @@ const UpdateImageModal = ({ open, handleClose, projectId, apiBaseUrl }) => {
               onClick={handleUpdateProject}
               disabled={uploading}
             >
-              {uploading ? <CircularProgress size={24} color="inherit" /> : "Upload"}
+              {uploading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Upload"
+              )}
             </Button>
           </Grid>
           <Grid item>

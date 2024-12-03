@@ -98,6 +98,9 @@
   
     .hamburger-menu {
       display: block;
+      display: flex;
+      align-items: center;
+      margin-right: 6px;
     }
     .sidebar-container {
       transform: translateX(-100%); /* Sidebar is hidden by default */

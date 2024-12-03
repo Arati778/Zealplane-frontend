@@ -1,5 +1,4 @@
-// UpdateProjectModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -7,7 +6,10 @@ import {
   Typography,
   CircularProgress,
   TextField,
+  Chip,
+  IconButton,
 } from "@mui/material";
+import { FaPlus, FaTimes } from "react-icons/fa"; // Importing React Icons (FontAwesome)
 import axios from "axios";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../../../../Auth/Axios";
@@ -22,28 +24,65 @@ const UpdateProjectModal = ({
   const [thumbnailImage, setThumbnailImage] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [tags, setTags] = useState([]);
+  const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
+
+  // Fetch existing project data when modal opens
+  useEffect(() => {
+    if (open && projectId) {
+      fetchProjectData();
+    }
+  }, [open, projectId]);
+
+  const fetchProjectData = async () => {
+    try {
+      const { data } = await axiosInstance.get(
+        `${apiBaseUrl}/projects/id/${projectId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setName(data.name || "");
+      setDescription(data.description || "");
+      setTags(data.tags || []);
+    } catch (error) {
+      console.error("Error fetching project data:", error);
+      toast.error("Failed to load project details.");
+    }
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) setThumbnailImage(file);
   };
 
+  const handleAddTag = () => {
+    if (newTag.trim() && !tags.includes(newTag)) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
   const handleUpdateProject = async () => {
     setLoading(true);
 
     try {
-      // Only perform PUT if name or description is non-empty
-      if (name || description) {
+      // Perform PUT request for updated fields
+      if (name || description || tags.length) {
         await axiosInstance.put(
           `${apiBaseUrl}/projects/id/${projectId}`,
-          { name, description },
-          { headers: { Authorization: `Bearer ${token}` } } // Add token for authorization if needed
+          { name, description, tags },
+          { headers: { Authorization: `Bearer ${token}` } }
         );
       }
 
-      // Only perform POST if thumbnailImage is provided
+      // Perform POST request for thumbnail image if updated
       if (thumbnailImage) {
         const formData = new FormData();
         formData.append("projectId", projectId);
@@ -58,8 +97,8 @@ const UpdateProjectModal = ({
       }
 
       toast.success("Project updated successfully!");
-      onProjectUpdate(); // Notify parent component to refresh project data
-      handleClose(); // Close the modal
+      onProjectUpdate(); // Notify parent to refresh data
+      handleClose(); // Close modal
     } catch (error) {
       console.error("Error updating project:", error);
       toast.error("Error updating project. Please try again.");
@@ -83,7 +122,7 @@ const UpdateProjectModal = ({
           InputLabelProps={{ style: { color: "#818384" } }}
           sx={{
             bgcolor: "#272729",
-            input: { color: "#d7dadc" },
+            input: { color: "white" },
             "& .MuiOutlinedInput-root": {
               "& fieldset": { borderColor: "#343536" },
               "&:hover fieldset": { borderColor: "#818384" },
@@ -108,6 +147,40 @@ const UpdateProjectModal = ({
             },
           }}
         />
+        <Box sx={{ display: "flex", gap: 1, mt: 2, flexWrap: "wrap" }}>
+          {tags.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              onDelete={() => handleRemoveTag(tag)}
+              sx={{
+                bgcolor: "#ff4500",
+                color: "#fff",
+                "& .MuiChip-deleteIcon": { color: "#fff" },
+              }}
+            />
+          ))}
+        </Box>
+        <Box sx={{ display: "flex", mt: 2, gap: 1 }}>
+          <TextField
+            label="Add Tag"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            fullWidth
+            InputLabelProps={{ style: { color: "#818384" } }}
+            sx={{
+              bgcolor: "#272729",
+              input: { color: "#d7dadc" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#343536" },
+                "&:hover fieldset": { borderColor: "#818384" },
+              },
+            }}
+          />
+          <IconButton onClick={handleAddTag} sx={{ color: "#ff4500" }}>
+            <FaPlus /> {/* Using React Icon here */}
+          </IconButton>
+        </Box>
         <input
           type="file"
           onChange={handleFileChange}

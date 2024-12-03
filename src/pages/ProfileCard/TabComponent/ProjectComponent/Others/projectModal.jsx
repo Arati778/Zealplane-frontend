@@ -6,37 +6,41 @@ import {
   DialogActions,
   TextField,
   FormControl,
-  MenuItem,
-  Select,
-  InputLabel,
+  Chip,
   Button,
   IconButton,
   CircularProgress,
   FormHelperText,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
 import ContentWrapper from "../../../../../components/contentWrapper/ContentWrapper";
 import Img from "../../../../../components/lazyLoadImage/Img";
 import { MdClose } from "react-icons/md";
+import { jwtDecode } from "jwt-decode";
 
 const ProjectModal = ({ open, onClose, onSubmit }) => {
   const userIdRedux = useSelector((state) => state.user.userId);
   const userIdLocalStorage = localStorage.getItem("Id");
   const userId = userIdRedux || userIdLocalStorage;
+  const token = localStorage.getItem("token");
+  const decode = jwtDecode(token);
+  const profilePic = decode?.profilePic;
+  console.log("decoded token is", profilePic);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     thumbnailImage: "",
-    category: "",
     tags: [],
+    profilePic: "",
     username: localStorage.getItem("username"),
+    profilePic: profilePic || "",
     id: Date.now(),
   });
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [tagInput, setTagInput] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,12 +57,39 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
     }));
   };
 
+  const handleProfilePicChange = (e) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      profilePic: e.target.files[0],
+    }));
+  };
+
+  const handleTagAdd = () => {
+    if (tagInput && !formData.tags.includes(tagInput)) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        tags: [...prevFormData.tags, tagInput],
+      }));
+      setTagInput("");
+    }
+  };
+
+  const handleTagDelete = (tagToDelete) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      tags: prevFormData.tags.filter((tag) => tag !== tagToDelete),
+    }));
+  };
+
   const validateForm = () => {
     const formErrors = {};
     if (!formData.name) formErrors.name = "Project Name is required.";
-    if (!formData.description) formErrors.description = "Project Description is required.";
-    if (!formData.category) formErrors.category = "Category is required.";
-    if (!formData.thumbnailImage) formErrors.thumbnailImage = "Thumbnail Image is required.";
+    if (!formData.description)
+      formErrors.description = "Project Description is required.";
+    if (!formData.thumbnailImage)
+      formErrors.thumbnailImage = "Thumbnail Image is required.";
+    if (formData.tags.length === 0)
+      formErrors.tags = "At least one tag is required.";
     return formErrors;
   };
 
@@ -77,8 +108,8 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
         name: "",
         description: "",
         thumbnailImage: "",
-        category: "",
         tags: [],
+        profilePic: profilePic || "",
         username: localStorage.getItem("username"),
         id: Date.now(),
       });
@@ -89,13 +120,6 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
       setLoading(false);
     }
   };
-
-  const categories = [
-    { value: "Artworks", label: "Artworks" },
-    { value: "Books", label: "Books" },
-    { value: "Comics", label: "Comics" },
-    { value: "Fan Art", label: "Fan Art" },
-  ];
 
   return (
     <Dialog
@@ -118,6 +142,19 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
           borderBottom: "1px solid #444", // Dark border for separation
         }}
       >
+        {formData.profilePic && (
+          <Img
+            src={formData.profilePic}
+            className="profile-pic"
+            alt="Profile Pic"
+            style={{
+              width: "100px",
+              height: "100px",
+              margin: "5px",
+              borderRadius: "50%",
+            }}
+          />
+        )}
         Add Comic Project
         <IconButton
           aria-label="close"
@@ -163,6 +200,7 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
           required
           error={!!errors.description}
           helperText={errors.description}
+          style={{ color: "#fff" }}
           sx={{
             marginBottom: 2,
             input: { color: "#fff" }, // White text color for input
@@ -171,41 +209,57 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
             },
           }}
         />
-        <FormControl fullWidth sx={{ marginBottom: 2 }} error={!!errors.category}>
-          <InputLabel id="category-label" sx={{ color: "#fff" }}>Category</InputLabel>
-          <Select
-            labelId="category-label"
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            sx={{
-              "& .MuiSelect-icon": { color: "#fff" }, // White icon color for dropdown
-            }}
-          >
-            {categories.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-          {errors.category && <FormHelperText>{errors.category}</FormHelperText>}
-        </FormControl>
+        <TextField
+          margin="dense"
+          placeholder="Add Tags"
+          type="text"
+          fullWidth
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleTagAdd()}
+          helperText="Press Enter to add tags"
+          sx={{
+            marginBottom: 2,
+            input: { color: "#fff" },
+            "& .MuiFormHelperText-root": { color: "#aaa" },
+          }}
+        />
+        <div style={{ marginBottom: "16px" }}>
+          {formData.tags.map((tag, index) => (
+            <Chip
+              key={index}
+              label={tag}
+              onDelete={() => handleTagDelete(tag)}
+              sx={{
+                margin: "4px",
+                backgroundColor: "#555",
+                color: "#fff",
+              }}
+            />
+          ))}
+          {errors.tags && (
+            <FormHelperText sx={{ color: "#e57373" }}>
+              {errors.tags}
+            </FormHelperText>
+          )}
+        </div>
         <input
           type="file"
           onChange={handleFileChange}
           accept="image/*"
           style={{ marginBottom: 16 }}
         />
-        {errors.thumbnailImage && <p style={{ color: "#e57373" }}>{errors.thumbnailImage}</p>}
+        {errors.thumbnailImage && (
+          <p style={{ color: "#e57373" }}>{errors.thumbnailImage}</p>
+        )}
         <ContentWrapper>
           <div>
             {formData.thumbnailImage && (
               <Img
                 src={URL.createObjectURL(formData.thumbnailImage)}
+                className="Thumbnail-Picture"
                 alt="Thumbnail"
-                style={{ width: "100px", height: "100px", margin: "5px" }}
+                style={{ width: "50px", height: "50px", margin: "5px" }}
               />
             )}
           </div>

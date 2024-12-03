@@ -49,7 +49,7 @@ const ProfileCard = () => {
         setStatus(response.data);
 
         setData({
-          fullName: fullName || "Enter Your Fullname",
+          fullName: fullName || "Enter Your Full Name",
           description: description || "Your Description!",
           jobRole: jobRole || "Your Profession",
           location: location || "Your Location",

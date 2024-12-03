@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaCommentAlt } from 'react-icons/fa';
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaArrowUp, FaArrowDown, FaCommentAlt } from "react-icons/fa";
 
 const Post = ({ post }) => {
   return (
@@ -8,7 +8,7 @@ const Post = ({ post }) => {
       <div className="post-header">
         <span className="subreddit">
           <Link to={`/r/${post.subreddit}`}>r/{post.subreddit}</Link>
-        </span> 
+        </span>
         • <span className="author"> Posted by u/{post.author}</span> •
         <span className="timestamp">{post.timestamp}</span>
       </div>

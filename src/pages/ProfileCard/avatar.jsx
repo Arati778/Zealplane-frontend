@@ -13,6 +13,7 @@ import { setUserId } from "../../store/userAction"; // Import the action to set 
 import { useDispatch } from "react-redux"; // Import useDispatch hook
 import Header from "../../components/header/Header";
 import { FaTimes, FaEdit } from "react-icons/fa";
+import { FiCamera } from "react-icons/fi";
 import ProfileImageUploadModal from "./ProfileImageUploadModal/ProfileImageUploadModal";
 import axiosInstance from "../../Auth/Axios";
 
@@ -35,6 +36,7 @@ const AvatarComponent = () => {
   const [response, setResponse] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const { id } = useParams();
+  const [status, setStatus] = useState(null);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
@@ -79,6 +81,10 @@ const AvatarComponent = () => {
         setUserDetails(response.data.user);
         setResponse(response.data);
         setProfilePic(response.data.user.profilePic);
+        setStatus(response.data.status);
+        console.log("status is", response.data);
+
+        console.log("status is", status);
 
         // Check status
         if (response.data.status === "visitor") {
@@ -194,13 +200,37 @@ const AvatarComponent = () => {
 
       <ContentWrapper>
         <div className="row">
-          <FaEdit />
+          {<FaEdit />}
           {isMobile ? (
             <div style={{ marginTop: "70px" }}>
               <div
                 className="card mb-3"
                 style={{ background: "rgba(55, 65, 122, 0.1)", color: "white" }}
               >
+                {/* Camera icon at the top right of the card */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "pointer",
+                  }}
+                  onClick={openModal}
+                >
+                  {status !== "visitor" && (
+                    <FiCamera
+                      style={{
+                        fontSize: "24px",
+                        color: "white",
+                        background: "transparent",
+                        borderRadius: "50%",
+                        padding: "4px",
+                        boxShadow: "0 0 10px rgba(215, 203, 205, 0.8)",
+                      }}
+                    />
+                  )}
+                </div>
                 <div className="card-body" style={{ marginRight: "10px" }}>
                   <Row justify="center" align="middle">
                     <Col>
@@ -402,7 +432,31 @@ const AvatarComponent = () => {
                     color: "white",
                   }}
                 >
-                  <div className="card-body" style={{ marginRight: "10px" }}>
+                  {/* Camera icon at the top right of the card */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      top: "10px",
+                      right: "10px",
+                      cursor: "pointer",
+                    }}
+                    onClick={openModal}
+                  >
+                    {status !== "visitor" && (
+                      <FiCamera
+                        style={{
+                          fontSize: "24px",
+                          color: "white",
+                          background: "transparent",
+                          borderRadius: "50%",
+                          padding: "4px",
+                          boxShadow: "0 0 10px rgba(215, 203, 205, 0.8)",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="card-body">
                     <Row justify="center" align="middle">
                       <Col>
                         {/* Avatar that triggers the modal */}
@@ -456,7 +510,7 @@ const AvatarComponent = () => {
                               <h5 className="pt-sm-2 pb-1 mb-0 mt-3 text-nowrap">
                                 {userDetails.fullName
                                   ? userDetails.fullName
-                                  : "Username not updated yet"}
+                                  : ""}
                               </h5>
                               <p
                                 className="mb-2"
@@ -539,8 +593,16 @@ const AvatarComponent = () => {
               </div>
             </>
           )}
+        </div>
+      </ContentWrapper>
+    </div>
+  );
+};
 
-          {/* <div className="col mb-3" style={{ marginTop: "50px" }}>
+export default AvatarComponent;
+
+{
+  /* <div className="col mb-3" style={{ marginTop: "50px" }}>
             <ProfileCard />
             <br />
             <TabComponent
@@ -690,8 +752,10 @@ const AvatarComponent = () => {
                   </div>
                 </div>
               </div>
-            </div> */}
-          {/* <div
+            </div> */
+}
+{
+  /* <div
             className="card"
             style={{ background: "rgba(55, 65, 122, 0.1)", color: "white" }}
           >
@@ -713,11 +777,5 @@ const AvatarComponent = () => {
             >
               <MyBio />
             </div>
-          </div> */}
-        </div>
-      </ContentWrapper>
-    </div>
-  );
-};
-
-export default AvatarComponent;
+          </div> */
+}

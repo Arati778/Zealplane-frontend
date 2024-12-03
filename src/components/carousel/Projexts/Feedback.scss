@@ -1,6 +1,7 @@
 .feedback {
   color: #ccc; /* Light text color */
   border-radius: 8px;
+  width: 85vw;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Increased shadow */
   margin-bottom: 20px;
 
@@ -15,7 +16,7 @@
     margin-bottom: 20px;
 
     .feedback-input {
-      width: 70%;
+      width:77%;
       padding: 10px;
       font-size: 16px;
       border: 1px solid #333; /* Darker border */
@@ -49,7 +50,11 @@
       background-color: #333;
       border-radius: 6px;
       color: #fff;
-
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      overflow: hidden;
+      width: 77%;
+      // max-width: 70%;
       .feedback-actions {
         display: flex;
         gap: 8px;
@@ -114,7 +119,7 @@
         border: 1px solid #555; /* Darker border */
         border-radius: 4px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly lighter shadow */
-        width: 70%;
+        // width: 70%;
   
         .feedback-info {
           display: flex;
@@ -142,6 +147,7 @@
   
         .feedback-text {
           font-size: 16px;
+          white-space: pre-wrap;
           color: #ccc; /* Light text color */
         }
       }
@@ -164,3 +170,22 @@
     }
   }
 
+
+  @media (max-width: 1105px) {
+    .feedback{
+      width: 96vw;
+    }
+    
+  }
+
+  @media (max-width: 768px) {
+    .feedback .feedback-list .feedback-item .feedback-text{
+      font-size: 13px;
+    }
+    .feedback .feedback-list .feedback-item {
+      width: 91vw;
+    }
+    .feedback .feedback-form .feedback-input {
+      width: 90%;
+    }
+  }

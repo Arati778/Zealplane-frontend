@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaUserCircle, FaTimes, FaBars } from "react-icons/fa";
+import {
+  FaSearch,
+  FaUserCircle,
+  FaTimes,
+  FaBars,
+  FaPlus,
+} from "react-icons/fa";
 import { BsChatDots } from "react-icons/bs";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiLogIn } from "react-icons/bi";
@@ -25,6 +31,7 @@ const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Fetch user details including profilePic
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (userId) {
@@ -65,18 +72,20 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="hamburger-menu" onClick={toggleSidebar}>
-        {isSidebarOpen ? (
-          <FaTimes className="icon" />
-        ) : (
-          <FaBars className="icon" />
-        )}
-      </div>
-
-      <div className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}>
-        <Sidebar />
-      </div>
       <div className="left-menu">
+        <div className="hamburger-menu" onClick={toggleSidebar}>
+          {isSidebarOpen ? (
+            <FaTimes className="icon" />
+          ) : (
+            <FaBars className="icon" />
+          )}
+        </div>
+
+        <div
+          className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
+        >
+          <Sidebar />
+        </div>
         <div className="header-logo">
           <Link to="/home">
             <img src={logozp} alt="Logo" className="logo" />{" "}
@@ -84,11 +93,19 @@ const Header = () => {
           </Link>
         </div>
         <nav className="header-nav">
-          {/* <Link to="/home" className="nav-link">Home</Link> */}
           <Link to="/forum/create-post" className="nav-link">
-            Create Post
+            {window.innerWidth <= 700 ? (
+              <div className="iconWrapper">
+                <FaPlus className="createPostIcon" />
+                <span className="hoverText">Create Post</span>{" "}
+                {/* Optional for tooltip */}
+              </div>
+            ) : (
+              "Create Post"
+            )}
           </Link>
         </nav>
+
         <div className="header-search">
           <Searchbar axiosInstance={axiosInstance} />
           {/* <FaSearch onClick={handleSearchClick} />
@@ -111,7 +128,12 @@ const Header = () => {
         >
           <IoMdNotificationsOutline />
         </Link>
-        <Link to="/login" className="icon-link" data-tooltip="Login">
+        <Link
+          to="/login"
+          className="icon-link"
+          id="logout-icon"
+          data-tooltip="Login"
+        >
           <BiLogIn />
         </Link>
         <Link

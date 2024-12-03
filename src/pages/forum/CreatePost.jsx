@@ -13,9 +13,11 @@ import axiosInstance from "../.../../../Auth/Axios";
 import "./createPost.scss";
 import Header from "./Component/Header";
 import Sidebar from "./Component/Sidebar";
+import Spinner from "../../components/spinner/Spinner";
 
 const CreatePost = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const userIdRedux = useSelector((state) => state.user.userId);
   const userIdLocalStorage = localStorage.getItem("Id");
@@ -112,7 +114,8 @@ const CreatePost = () => {
 
     const cleanedBody = body
       .replace(/<\/?p>/g, "")
-      .replace(/<br\s*\/?>/gi, "\n");
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/background-color:[^;]+;/gi, ""); // Removes background-color styles
 
     const postData = new FormData();
     postData.append("title", title);
@@ -124,7 +127,9 @@ const CreatePost = () => {
     if (image) {
       postData.append("post_image", image); // Appending the image to FormData
     }
-    console.log("formdta appped=nded succesfully!");
+    console.log("formData appended successfully!");
+
+    setLoading(true); // Set loading state to true when submitting
 
     try {
       const res = await axiosInstance.post(
@@ -139,7 +144,6 @@ const CreatePost = () => {
       );
       console.log("Post created successfully!", res.data);
       navigate(`/post/${res.data._id}`);
-      console.log("Post created successfully!");
       setFormData({
         title: "",
         body: "",
@@ -157,6 +161,8 @@ const CreatePost = () => {
         console.error("Error message:", err.message);
       }
       toast.error("Failed to create post!");
+    } finally {
+      setLoading(false); // Set loading state to false once the request completes
     }
   };
 
@@ -175,6 +181,15 @@ const CreatePost = () => {
         </div>
 
         <div className="create-post">
+          {loading && (
+            <div className="loading-screen">
+              <p>
+                <Spinner />
+              </p>{" "}
+              {/* You can add a spinner here */}
+            </div>
+          )}
+
           <h2>Create a New Post</h2>
           <div className="user-info">
             {profilePic && <img src={profilePic} alt="Profile" />}
@@ -196,6 +211,7 @@ const CreatePost = () => {
               <label>Body</label>
               <ReactQuill
                 value={body}
+                theme="snow"
                 onChange={handleBodyChange}
                 required
                 placeholder="Write your post content here..."
@@ -251,8 +267,19 @@ const CreatePost = () => {
                 </div>
               )}
             </div>
-            <button type="submit" className="submit-button">
-              Create Post
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={loading} // Disable the button while loading
+            >
+              {loading ? (
+                <>
+                  Creating Post...
+                  <div className="spinner"></div>
+                </>
+              ) : (
+                "Create Post"
+              )}
             </button>
           </form>
         </div>

@@ -17,9 +17,10 @@
 
 .content1 {
   display: flex;
+  justify-content: space-between;
   position: relative;
   // flex-direction: column;
-  gap: 25px;
+  gap: 20px;
  
   overflow: hidden;
 
@@ -37,7 +38,7 @@
   }
 
   .right1 {
-    width: 55vh; /* Fixed width */
+    width: 48vh; /* Fixed width */
     height: 100%; /* Full height of the viewport */
     overflow-y: auto; /* Allow scrolling if content overflows */
     background-color: #1c1c1c; /* Dark background for a DeviantArt-like appearance */
@@ -157,6 +158,29 @@
       font-size: 14px;
     }
   }
+
+  .plus-icon {
+    position: absolute;
+    right: 10px;
+    color: white;
+    background-color: transparent;
+    // padding: 10px;
+    // margin-top: -60px;
+    // border-radius: 10%;
+    // border: 1px solid white;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  
+  .plus-icon:hover {
+    color: #1dbf73;
+    border: 1px solid #1dbf73;
+  }
+  
+  .plus-icon-inner {
+    font-size: 21px;
+  }
+  
   
   /* Media Queries for responsive design */
   @media (max-width: 768px) {
@@ -177,6 +201,9 @@
   }
   
   @media (max-width: 480px) {
+    .content1 .right1{
+      display: none;
+    }
     .project-item {
       width: calc(100% - 20px); /* Full width for very small screens */
     }
@@ -307,6 +334,7 @@
 
 .User-Profile {
   display: flex;
+  width: 70vw;
   align-items: center;
   margin-bottom: 20px;
   color: white;
@@ -331,11 +359,13 @@
     .user-description {
       font-size: 16px;
       margin-bottom: 10px;
+      color: #d3d3d2;
     }
 
     .user-stats {
       display: flex;
       margin-bottom: 10px;
+      color: #d3d3d2;
 
       .stat {
         margin-right: 20px;
@@ -428,8 +458,8 @@
 
   box-sizing: border-box;
   margin-top: 10px; /* Adjust this as needed */
-  // overflow: visible;
-  margin-left: 50px;
+
+  margin-left: 0px;
 }
 
 
@@ -606,7 +636,7 @@
   color: rgb(219, 218, 218);
   margin-top: 30px;
   font-size: 17px;
-  width: 70%;
+  width: 60vw;
   letter-spacing: 0.6px;
 
   .Description-Title {
@@ -623,15 +653,85 @@
   width: 350px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1224px) {
+  .content1 .right1{
+    width: 45vh;
+  }
+}
+
+
+
+/* Media Query for Tablet Screens */
+@media (max-width: 1105px) {
   .content1 {
-    flex-direction: column;
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking if required */
+  }
+  .mySwiper{
+    height: 490px;
+    width: 75vw;
+  }
+  .content1 .left1 {
+    margin-right: 20px; /* Add spacing between .left1 and .right1 */
+    width: 90vw;
   }
 
-  .left1,
-  .right1 {
-    min-width: 100%;
-    margin-bottom: 20px; /* Add spacing between sections */
+  .content1 .right1{
+    width: 15vh;
+    padding: 10px;
+    
+  
+  }
+  .content1 .project-item{
+    margin: 2px;
+    width: calc(100% - 20px);
+  }
+  .mySwiper-thumbs{
+    width: 400px;
+  }
+  .description1{
+    width: 80%;
+  }
+  .User-Profile{
+    width: 80vw;
+    display: contents;
+  }
+  .plus-icon{
+    margin-right: 130px;
+  }
+  
+}
+
+@media (max-width: 768px) {
+  
+  .content1 .right1 {
+    display: none;
+  }
+  .description1{
+    width: 90%;
+    font-size: 13px;
+  }
+  .mySwiper{
+    width: 92vw;
+  }
+  .title h1{
+    font-size: 22px;
+  }
+  .User-Profile .user-details .username{
+    font-size: 20px;
+  }
+  .avatarImage{
+    width: 30px;
+    height: 30px;
+  }
+  .menuItem{
+    font-size: 13px;
+  }
+  .badge{
+    font-size: 9px;
+  }
+  .menuItems{
+    gap: 0;
   }
 
   .project-item {
@@ -641,36 +741,26 @@
   .project-content h4 {
     font-size: 12px; /* Adjust font size */
   }
-}
-
-/* Media Query for Tablet Screens */
-@media (max-width: 1024px) {
-  .content1 {
-    flex-direction: column;
+  .User-Profile{
+    display: contents;
+    width: 77vw;
   }
-
-  .project-item {
-    width: 48%; /* Two columns */
+  .plus-icon{
+    margin-right: 20px;
   }
 }
+
+
 
 /* Media Query for Desktop Screens */
 @media (min-width: 1025px) {
-  .content1 {
-    flex-direction: row;
-  }
-
-  .left1 {
-    flex: 2;
-  }
-
-  .right1 {
-    flex: 1;
-    position: sticky; /* Sticky position for desktop */
-    top: 60px;
-  }
+  
+  // .content1 .right1 {
+  //   width: 45vh;
+  // }
 
   .project-item {
     width: calc(33.33% - 20px); /* Three columns */
   }
 }
+

@@ -5,109 +5,147 @@ body {
   margin: 0;
   padding: 0;
 }
-
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  // background-color: #272729;
-  top: 0;
   gap: 10px;
   background-color: #1a1a1b;
   width: 100%;
   padding: 8px 25px;
-  border-bottom: 1px solid #343536; /* Slight border for separation */
+  border-bottom: 1px solid #343536;
   position: fixed;
+  top: 0;
   z-index: 1000;
-  /* Logo Styling */
-  
-  .header-logo {
-    display: flex;
-    align-items: center;
 
+  .header-logo {
     img {
-      width: 40px; /* Adjust the logo width */
-      height: auto; /* Ensure height is automatically adjusted */
+      width: 40px;
+      height: auto;
     }
   }
 
-
-  /* Navigation Links */
   .header-nav {
-    display: inline;
     gap: 20px;
-
+    display: flex;
+    align-items: center;
     .nav-link {
       text-decoration: none;
-      color: #d7dadc; /* Light text color for links */
+      color: #d7dadc;
       font-weight: bold;
-    
       border: 1px solid rgb(69, 68, 68);
       padding: 5px 16px;
       border-radius: 15px;
 
       &:hover {
         background: #343536;
-        color: #0079d3; /* Blue on hover */
+        color: #0079d3;
       }
     }
   }
-.left-menu{
-  display: flex;
-  gap: 70px;
-}
-  /* Search Bar */
-  // .header-search {
-  //   display: flex;
-  //   align-items: center;
-  //   background-color: #343536; /* Darker search bar background */
-  //   padding: 5px 8px;
-  //   border-radius: 17px;
-  //   width: 100%; /* Makes the search bar responsive */
-  //   max-width: 500px; /* Sets a maximum width to prevent it from becoming too large on larger screens */
-  //   margin: 1px 55px;
- 
 
-
-  //   input {
-  //     border: none;
-  //     background: none;
-  //     color: #d7dadc; /* Light text inside the search bar */
-  //     margin-left: 5px;
-  //     font-size: 14px;
-  //     outline: none;
-  //     width: 450px;
-  //    // padding: 4px 5px;
-      
-  //   }
-    
-  // }
-  
-  /* Icon Links */
-  .header-icons {
+  .left-menu {
     display: flex;
-    align-items: center;
+    gap: 70px;
+  }
+
+  .header-icons {
     gap: 15px;
 
     .icon-link {
-      color: #d7dadc; /* White/light icons */
-      font-size: 27px; /* Adjust icon size */
+      color: #d7dadc;
+      font-size: 27px;
 
       &:hover {
-        color: #0079d3; /* Blue on hover for icons */
+        color: #0079d3;
       }
     }
 
-    /* Profile Picture */
     .profile-pic {
       width: 40px;
       height: 40px;
-      border-radius: 50%; /* Circular profile picture */
-      object-fit: cover; /* Ensure the image doesn't stretch */
+      border-radius: 50%;
+      object-fit: cover;
     }
   }
 
+  /* Responsive Design */
+  @media (max-width: 768px) {
+   
+    padding: 10px 5px;
+    gap: 0;
+    .left-menu {
+     gap: 0px;
+    }
+    
+    .search-bar input {
+      padding: 0.5rem 0.4rem 0.3rem 2rem;
+      font-size: 14px;
+      width: 150px;
+      margin-left: -15px;
+    }
+    .search-bar .search-icon{
+      left: 0;
+    }
+    .search-results-list{
+      width: 390px;
+      left: -45px;
+  }
+  // .header-search {
+  //   input {
+  //     width: 150px; /* Narrower width for smaller screens */
+  //   }
+  // }
+  #logout-icon{
+    display: none;
+  }
+
+    .header-nav {
+      gap: 10px;
+      // display: flex;
+      // align-items: center;
+      .nav-link {
+       border: none;
+        padding: 4px 12px;
+      }
+     
+    }
+    .search-bar{
+      margin-left: 0;
+    }
+    .header-icons {
+      gap: 10px;
+
+      .icon-link {
+        font-size: 24px;
+      }
+
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    // .header-nav {
+    //   display: none;
+    // }
+    
+   .header-logo img {
+      width: 36px;
+    }
+    .header-icons {
+      gap: 1px;
+      display: flex;
+
+      .icon-link {
+        font-size: 22px;
+      }
+    }
+  }
 }
+
 .home-container {
   display: flex;
   flex-direction: column;
@@ -308,24 +346,21 @@ body {
   }
 }
 
-@media(max-width: 1100px){
-  .sidebar-component{
+@media (max-width: 1200px) {
+  .sidebar-component {
     display: none;
+  }
+  
+  .header-search {
+    input {
+      width: 300px; /* Set the width to 300px for search bar input */
+    }
+  }
+  .header .left-menu{
+    gap: 0;
   }
 }
 
-@media(max-width: 900px){
- 
-  .nav-link{
-    font-size: 16px;
-  }
-  .header-search{
-  
-    margin: 1px 20px;
-    padding: 10px;
-    input{
-      width: 200px;
-    }
-  }
-  
-}
+
+
+

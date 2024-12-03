@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./Feedback.scss";
 import avatar from "../../../assets/avatar.png";
 import { formatDistanceToNow } from "date-fns";
 import axiosInstance from "../../../Auth/Axios";
+import { jwtDecode } from "jwt-decode";
 
 const Feedback = () => {
   const [feedbackText, setFeedbackText] = useState("");
@@ -14,8 +15,9 @@ const Feedback = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const username = localStorage.getItem("username");
   const { projectId } = useParams();
-
   const token = localStorage.getItem("token");
+
+  const textAreaRef = useRef(null); // Reference for the text area
 
   // Fetch comments when the component mounts
   useEffect(() => {
@@ -35,13 +37,16 @@ const Feedback = () => {
     fetchComments();
   }, [projectId]);
 
+  // Focus on the text area when editing
+  useEffect(() => {
+    if (editingCommentId !== null) {
+      textAreaRef.current?.focus(); // Set focus to the text area when editing
+    }
+  }, [editingCommentId]);
+
   // Handle feedback submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!feedbackText || rating === 0) {
-      alert("Please provide feedback text and a rating!");
-      return;
-    }
 
     const newFeedback = { username, commentText: feedbackText, rating };
 
@@ -65,14 +70,25 @@ const Feedback = () => {
     setRating(value);
   };
 
-  // Edit comment
   const handleEdit = (comment) => {
+    // Decode the token and get the username
+    const decodedToken = jwtDecode(token);
+    const decodedUsername = decodedToken.username; // Assuming the token has the username field
+
+    // Log the values for comparison
+    console.log("Comment Username:", comment.username);
+    console.log("Decoded Username from Token:", decodedUsername);
+
+    if (comment.username !== decodedUsername) {
+      alert("You can only edit your own comments.");
+      return; // Prevent editing if it's not the user's comment
+    }
+
     setEditingCommentId(comment._id);
     setFeedbackText(comment.commentText);
     setRating(comment.rating);
   };
 
-  // Update comment
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -90,13 +106,34 @@ const Feedback = () => {
       setFeedbackText("");
       setRating(0);
       setEditingCommentId(null);
+
+      // Show success alert
+      alert("Your comment has been successfully updated!");
     } catch (error) {
       console.error("Error updating feedback:", error);
     }
   };
 
   // Delete comment
-  const handleDelete = async (commentId) => {
+  const handleDelete = async (commentId, commentUsername) => {
+    // Decode the token and get the username
+    const decodedToken = jwtDecode(token);
+    const decodedUsername = decodedToken.username; // Assuming the token has the username field
+
+    if (commentUsername !== decodedUsername) {
+      alert("You can only delete your own comments.");
+      return; // Prevent deletion if it's not the user's comment
+    }
+
+    // Show confirmation pop-up
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this comment?"
+    );
+
+    if (!isConfirmed) {
+      return; // If user clicks 'Cancel', don't delete the comment
+    }
+
     try {
       await axios.delete(`${apiBaseUrl}/projects/${projectId}/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -105,6 +142,9 @@ const Feedback = () => {
       setFeedbackList(
         feedbackList.filter((comment) => comment._id !== commentId)
       );
+
+      // Show success alert
+      alert("Your comment has been successfully deleted!");
     } catch (error) {
       console.error("Error deleting feedback:", error);
     }
@@ -120,6 +160,7 @@ const Feedback = () => {
         onSubmit={editingCommentId ? handleUpdate : handleSubmit}
       >
         <textarea
+          ref={textAreaRef} // Add the reference to the text area
           className="feedback-input"
           placeholder="Write your feedback here..."
           rows="4"
@@ -178,7 +219,7 @@ const Feedback = () => {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(feedback._id)}
+                  onClick={() => handleDelete(feedback._id, feedback.username)}
                   className="delete-button"
                 >
                   Delete

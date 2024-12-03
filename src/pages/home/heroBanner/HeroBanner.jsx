@@ -24,6 +24,7 @@ import "./style.scss";
 import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/pagination";
+import Anonimous from "../../../../public/anonymous-profile-silhouette-b714qekh29tu1anb.png";
 
 // TruncatedDescription Component
 const TruncatedDescription = ({ description, maxLength = 100 }) => {
@@ -49,7 +50,7 @@ const HeroBanner = ({ selectedPosterUrl }) => {
   const [datas, setDatas] = useState([]);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
   const { url } = useSelector((state) => state.home);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -72,6 +73,7 @@ const HeroBanner = ({ selectedPosterUrl }) => {
           (project) =>
             project.thumbnailImage && project.thumbnailImages.length > 0
         );
+        console.log("project data is", validProjects); // Removed `.data` as `validProjects` is already the filtered array
         setDatas(shuffleArray(validProjects)); // Shuffle the projects
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -79,6 +81,14 @@ const HeroBanner = ({ selectedPosterUrl }) => {
     };
     fetchProjects();
   }, []);
+
+  const onProfileClick = (uniqueId) => {
+    if (uniqueId) {
+      navigate(`/profile/${uniqueId}`);
+    } else {
+      alert("uniqueId not available");
+    }
+  };
 
   const handleShareClick = (project) => {
     setSelectedProject(project);
@@ -137,7 +147,12 @@ const HeroBanner = ({ selectedPosterUrl }) => {
               <SwiperSlide key={project.projectId}>
                 <div className="slideContent">
                   <div className="imageWrapper">
-                    <img src={project.thumbnailImage} alt={project.name} />
+                    <img
+                      src={project.thumbnailImage}
+                      alt={project.name}
+                      onClick={() => navigate(`/details/${project.projectId}`)} // Navigate on image click
+                      style={{ cursor: "pointer" }}
+                    />
                   </div>
 
                   {/* Title and Description in a separate div */}
@@ -145,19 +160,31 @@ const HeroBanner = ({ selectedPosterUrl }) => {
                     <div className="title">{project.name}</div>
                     <TruncatedDescription
                       description={project.description}
-                      maxLength={window.innerWidth <= 768 ? 25 : 100}
+                      maxLength={window.innerWidth <= 768 ? 25 : 90}
                     />
                   </div>
 
                   {/* Static Content with User Info and Icons */}
                   <div className="staticContent">
                     <div className="userInfo">
+                      {console.log(
+                        "profilePic for this project:",
+                        project.profilePic
+                      )}
                       <img
                         className="profilePicture"
-                        src={project.profilePic}
-                        alt={project.username}
+                        src={
+                          project.profilePic ? project.profilePic : Anonimous
+                        }
+                        alt={project.username || "Anonymous User"}
+                        onClick={() => onProfileClick(project.uniqueId)}
                       />
-                      <span className="username">{project.username}</span>
+                      <span
+                        className="username"
+                        onClick={() => onProfileClick(project.uniqueId)}
+                      >
+                        {project.username || "Anonymous User"}
+                      </span>
                     </div>
 
                     <div className="icons">
@@ -195,27 +222,27 @@ const HeroBanner = ({ selectedPosterUrl }) => {
         >
           <div className="shareOptions">
             <FacebookShareButton
-              url={`${window.location.origin}/project/${selectedProject.projectId}`}
+              url={`${window.location.origin}/details/${selectedProject.projectId}`}
             >
               <FacebookIcon size={32} round />
             </FacebookShareButton>
             <TwitterShareButton
-              url={`${window.location.origin}/project/${selectedProject.projectId}`}
+              url={`${window.location.origin}/details/${selectedProject.projectId}`}
             >
               <TwitterIcon size={32} round />
             </TwitterShareButton>
             <LinkedinShareButton
-              url={`${window.location.origin}/project/${selectedProject.projectId}`}
+              url={`${window.location.origin}/details/${selectedProject.projectId}`}
             >
               <LinkedinIcon size={32} round />
             </LinkedinShareButton>
             <WhatsappShareButton
-              url={`${window.location.origin}/project/${selectedProject.projectId}`}
+              url={`${window.location.origin}/details/${selectedProject.projectId}`}
             >
               <WhatsappIcon size={32} round />
             </WhatsappShareButton>
             <RedditShareButton
-              url={`${window.location.origin}/project/${selectedProject.projectId}`}
+              url={`${window.location.origin}/details/${selectedProject.projectId}`}
             >
               <RedditIcon size={32} round />
             </RedditShareButton>

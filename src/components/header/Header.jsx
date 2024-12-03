@@ -81,67 +81,6 @@ const Header = () => {
     };
   }, [lastScrollY]);
 
-  // Fetch search results as user types---------------
-  // const searchQueryHandler = async (event) => {
-  //   const searchQuery = event.target.value.trim(); // Trim whitespace from input
-  //   setQuery(searchQuery); // Update the query state
-  //   const token = localStorage.getItem("token");
-
-  //   if (event.key === "Enter" && searchQuery.length > 0) {
-  //     navigate(`/search/${searchQuery}`); // Navigate to the SearchResult component
-  //     setShowSearch(false); // Hide search bar after navigating
-  //     setShowSearchList(false); // Hide search results list
-  //   } else if (searchQuery.length > 0) {
-  //     try {
-  //       const response = await axiosInstance.get(
-  //         `users/username/${searchQuery}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`, // Include token in Authorization header
-  //           },
-  //         }
-  //       );
-
-  //       const filteredResults = response.data.filter(
-  //         (user) => user.fullName && user.profilePic
-  //       );
-
-  //       const sortedResults = filteredResults.sort((a, b) => {
-  //         const matchA = a.fullName
-  //           .toLowerCase()
-  //           .startsWith(searchQuery.toLowerCase())
-  //           ? 1
-  //           : 0;
-  //         const matchB = b.fullName
-  //           .toLowerCase()
-  //           .startsWith(searchQuery.toLowerCase())
-  //           ? 1
-  //           : 0;
-
-  //         if (matchA === matchB) {
-  //           return a.fullName.localeCompare(b.fullName);
-  //         }
-
-  //         return matchB - matchA;
-  //       });
-
-  //       setSearchResults(sortedResults);
-  //       setShowSearchList(true); // Show the dropdown with results
-  //     } catch (error) {
-  //       console.error("Error fetching search results:", error);
-  //     }
-  //   } else {
-  //     setSearchResults([]);
-  //     setShowSearchList(false); // Hide the dropdown when the input is cleared
-  //   }
-  // };
-
-  // Navigate to the user's profile --------------------
-  // const handleSearchItemClick = (userId) => {
-  //   navigate(`/profile/${userId}`);
-  //   setShowSearchList(false); // Hide the search results after click
-  // };
-
   const handleProfileClick = () => {
     setShowProfileOptions(!showProfileOptions);
   };
@@ -173,47 +112,10 @@ const Header = () => {
           <img src={logozp} alt="Logo" />
         </div>
         <Searchbar axiosInstance={axiosInstance} />
-        {/* <form className="search-bar">
-          <span className="search-icon">
-            <FaSearch />
-          </span>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={query}
-            onChange={searchQueryHandler}
-            onKeyDown={searchQueryHandler} // Trigger the handler on key press
-          />
-          {showSearchList && query.length > 0 && (
-            <div className="search-results-list">
-              {searchResults.length > 0 ? (
-                searchResults.map((user) => (
-                  <div
-                    key={user.uniqueId}
-                    className="search-result-item"
-                    onClick={() => handleSearchItemClick(user.uniqueId)}
-                  >
-                    <FaSearch className="search-item-icon" />
-                    <img
-                      src={user.profilePic || avatar} // Use user's profilePic or fallback to default avatar
-                      alt={`${user.fullName}'s avatar`}
-                      className="search-result-avatar"
-                    />
-                    <div className="search-user-details">
-                      <span className="user-fullname">{user.fullName}</span>
-                      <span className="user-jobrole"> • {user.jobRole}</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="no-results">No results found</p>
-              )}
-            </div>
-          )}
-        </form> */}
+
         <ul className="menuItems">
           <li className="menuItem1" onClick={handleForumClick}>
-            {window.innerWidth <= 768 ? (
+            {window.innerWidth <= 568 ? (
               <div className="iconWrapper">
                 <FaUsers className="communityIcon" />
                 <span className="hoverText">Communities</span>
@@ -237,7 +139,11 @@ const Header = () => {
               className="avatarImage"
               onClick={handleProfileClick}
             />
-            {userName && <span className="username">{userName}</span>}
+            {userName && (
+              <span className="username" onClick={handleProfileClick}>
+                {userName}
+              </span>
+            )}
             {showProfileOptions && (
               <div className="profile-options">
                 <ul>

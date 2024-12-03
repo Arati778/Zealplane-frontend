@@ -1,4 +1,3 @@
-// src/components/PostDetail/PostDetail.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -9,6 +8,7 @@ import PostInteractions from "./Component/Posts/PostInteract";
 import CommentsSection from "./Component/Posts/CommentsSection";
 import Sidebar from "./Component/Sidebar"; // Import Sidebar
 import Spinner from "../../components/spinner/Spinner";
+import { toast } from "react-toastify"; // Assuming you are using react-toastify
 
 const PostDetail = () => {
   const { id } = useParams(); // Get the post ID from the URL
@@ -49,7 +49,8 @@ const PostDetail = () => {
         });
         setStatus(response.data.status);
         setComments(response.data.post.comments || []); // Ensure comments is an array
-        setUserVote(response.data.post.userVote || null); // Initialize user vote
+        setUserVote(response.data.post.votes || []); // Initialize user vote
+        console.log("user votes are", userVote);
       } catch (error) {
         console.error("Error fetching post:", error);
       }
@@ -60,21 +61,17 @@ const PostDetail = () => {
 
   const handleVote = async (voteType) => {
     try {
-      const isUpvote = voteType === "upvote";
-      const isDownvote = voteType === "downvote";
-
-      // Set the voteType to 1 (upvote) or -1 (downvote) based on the voteType string
-      const voteValue = isUpvote ? 1 : isDownvote ? -1 : null;
-
-      if (voteValue === null) {
-        console.error("Invalid vote type");
+      if (voteType !== "upvote") {
+        console.error("Invalid vote type"); // Only allow upvote
         return;
       }
+
+      const voteValue = 1; // Set vote value to 1 for upvote
 
       // Update vote on the backend
       const res = await axios.put(
         `http://localhost:5000/api/posts/votes/${id}`,
-        { voteType: voteValue }, // Send voteType as a number (1 or -1)
+        { voteType: voteValue }, // Send voteType as 1 for upvote
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("votes after post is", res);
@@ -88,13 +85,13 @@ const PostDetail = () => {
       if (existingVoteIndex !== -1) {
         // User has already voted
         if (updatedVotes[existingVoteIndex].voteValue === voteValue) {
-          // Undo vote
+          // Undo vote (remove the vote)
           updatedVotes.splice(existingVoteIndex, 1);
           setUserVote(null);
         } else {
-          // Change vote
+          // Change vote to upvote
           updatedVotes[existingVoteIndex].voteValue = voteValue;
-          setUserVote(voteType);
+          setUserVote("upvote");
         }
       } else {
         // New vote
@@ -103,12 +100,31 @@ const PostDetail = () => {
           voteValue: voteValue,
           timestamp: new Date(),
         });
-        setUserVote(voteType);
+        setUserVote("upvote");
       }
 
       setPost((prevPost) => ({ ...prevPost, votes: updatedVotes }));
     } catch (error) {
       console.error("Error voting on post:", error);
+    }
+  };
+
+  const handleEditPost = async (updatedData) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/posts/${post._id}`,
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Post updated successfully!");
+      setPost(response.data.updatedPost); // Update your post state with the new data
+    } catch (error) {
+      console.error("Error updating post:", error);
+      toast.error("Failed to update the post!");
     }
   };
 
@@ -125,7 +141,12 @@ const PostDetail = () => {
           <Sidebar />
         </div>
         <div className="post-content">
-          <PostInfo post={post} status={status} />
+          <PostInfo
+            post={post}
+            status={status}
+            OnEdit={handleEditPost} // Pass the handleEditPost function to PostInfo
+            onEdit={handleEditPost}
+          />
 
           <PostInteractions
             post={post}
