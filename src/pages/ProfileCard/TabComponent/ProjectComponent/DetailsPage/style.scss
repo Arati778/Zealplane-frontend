@@ -167,7 +167,7 @@
     // padding: 10px;
     // margin-top: -60px;
     // border-radius: 10%;
-    // border: 1px solid white;
+    border: 1px solid white;
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease;
   }
@@ -746,7 +746,10 @@
     width: 77vw;
   }
   .plus-icon{
-    margin-right: 20px;
+    margin-right: 1px;
+  }
+  .mySwiper-thumbs{
+    width: 290px;
   }
 }
 

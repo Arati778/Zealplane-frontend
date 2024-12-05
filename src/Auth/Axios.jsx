@@ -21,28 +21,24 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response && error.response.status === 401) {
-      // Token expired, attempt to refresh it
-      toast.info("Your session has expired. Generating a new token..."); // Notify the user about token expiration
-
       try {
         const refreshToken = localStorage.getItem("refreshToken");
         console.log("refresh token is", refreshToken);
-        
+
         if (!refreshToken) {
           return Promise.reject(error); // If no refresh token, reject the error
         }
 
         // Request to refresh the token
         const refreshResponse = await axios.post(
-            `${apiBaseUrl}/refresh-token`, 
-            { refreshToken }, // This should be the exact body sent in Thunder Client
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          
+          `${apiBaseUrl}/refresh-token`,
+          { refreshToken }, // This should be the exact body sent in Thunder Client
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         const { accessToken } = refreshResponse.data; // Assuming response contains 'accessToken'
         localStorage.setItem("token", accessToken); // Update token in localStorage

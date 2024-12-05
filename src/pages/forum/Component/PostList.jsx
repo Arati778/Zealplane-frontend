@@ -10,6 +10,11 @@ const PostList = ({ posts }) => {
     console.log(`Shared post with ID: ${postId}`);
   };
 
+  const handleUpvote = (postId) => {
+    // Upvote logic
+    console.log(`Upvoted post with ID: ${postId}`);
+  };
+
   return (
     <div className="post-list">
       {posts.map((post) => (
@@ -52,9 +57,19 @@ const PostList = ({ posts }) => {
             ></p>
 
             <div className="post-meta">
-              <span className="post-likes">
-                <BiUpvote /> Likes
-              </span>
+              {/* Upvote Button with Vote Count */}
+              <div
+                className="post-upvote"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleUpvote(post._id);
+                }}
+              >
+                <BiUpvote className="upvote-icon" />
+                <span className="vote-count">
+                  {Array.isArray(post.votes) ? post.votes.length : 0}
+                </span>
+              </div>
               <span className="post-comments">
                 <FaRegCommentAlt />{" "}
                 {Array.isArray(post.comments) ? post.comments.length : 0}{" "}

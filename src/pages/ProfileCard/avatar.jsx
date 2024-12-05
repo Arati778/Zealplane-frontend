@@ -468,6 +468,7 @@ const AvatarComponent = () => {
                             style={{
                               boxShadow: "0 0 10px rgba(255, 0, 0, 0.8)",
                               border: "2px solid rgba(255, 0, 0, 0.8)",
+                              cursor: "pointer",
                             }}
                             onClick={openModal}
                           />
@@ -518,7 +519,7 @@ const AvatarComponent = () => {
                               >
                                 @{user || userDetails.username}
                               </p>
-                              <p
+                              {/* <p
                                 className="mb-0"
                                 style={{
                                   fontSize: "16px",
@@ -527,7 +528,7 @@ const AvatarComponent = () => {
                                 }}
                               >
                                 Level: {level}
-                              </p>
+                              </p> */}
                             </>
                           ) : (
                             <p>User data not available</p>
@@ -536,13 +537,13 @@ const AvatarComponent = () => {
                       )}
                       <Row justify="center" style={{ marginTop: "20px" }}>
                         <Col>
-                          <Button
+                          {/* <Button
                             type="button"
                             className="custom-button"
                             // onClick={handleEnquiry}
                           >
                             Enquiry
-                          </Button>
+                          </Button> */}
                         </Col>
                       </Row>
                       <div className="text-muted">

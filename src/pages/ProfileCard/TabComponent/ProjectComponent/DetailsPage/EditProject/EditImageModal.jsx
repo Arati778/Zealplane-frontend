@@ -89,6 +89,7 @@ const EditImageUpdate = ({
           onClick={handleImageClose}
           style={{
             position: "absolute",
+            zIndex: 1000,
             top: 10,
             right: 10,
             color: "white",
@@ -101,7 +102,7 @@ const EditImageUpdate = ({
           }}
         />
         <Typography variant="h6" sx={{ color: "#d7dadc", mb: 2 }}>
-          Update Project Image
+          Add Project Image
         </Typography>
 
         {/* Display previous images */}
@@ -187,7 +188,7 @@ const EditImageUpdate = ({
           {loading ? (
             <CircularProgress size={24} sx={{ color: "#fff" }} />
           ) : (
-            "Update Image"
+            "Add Image"
           )}
         </Button>
 
@@ -224,7 +225,7 @@ const modalStyles = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: window.innerWidth <= 768 ? 360 : 400,
   bgcolor: "#1a1a1b",
   borderRadius: "8px",
   boxShadow: 24,

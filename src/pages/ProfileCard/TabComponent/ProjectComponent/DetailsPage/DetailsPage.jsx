@@ -440,31 +440,26 @@ const DetailsPage = () => {
                     </SwiperSlide>
                   )}
                 </Swiper>
-                <div
-                  className="plus-icon"
-                  style={{
-                    position: "absolute",
-
-                    right: "10px", // Adjust as needed
-                    // color: "white",
-                    padding: "10px",
-                    marginTop: "-60px",
-                    borderRadius: "10%",
-                    // border: "1px solid white",
-                    // cursor: "pointer",
-                    // transition: "transform 0.2s ease",
-                  }}
-                >
-                  {status !== "visitor" && (
+                {status !== "visitor" && (
+                  <div
+                    className="plus-icon"
+                    style={{
+                      position: "absolute",
+                      right: "10px", // Adjust as needed
+                      padding: "10px",
+                      marginTop: "-60px",
+                      borderRadius: "10%",
+                    }}
+                  >
                     <FaPlus
                       title="Add Image"
                       className="plus-icon-inner"
                       style={{ fontSize: "21px" }}
                       onClick={handleImageOpen}
+                      onTouchStart={handleImageOpen}
                     />
-                  )}
-                </div>
-
+                  </div>
+                )}
                 <div className="description1">{projectData.description}</div>
               </div>
 

@@ -1,7 +1,9 @@
 import React from "react";
-import { BiUpvote, BiDownvote } from "react-icons/bi";
+import { BiUpvote } from "react-icons/bi";
 import { FaRegCommentAlt } from "react-icons/fa";
 import { RiShareForwardLine } from "react-icons/ri";
+import { FaArrowUp } from "react-icons/fa";
+import "./PostInteraction.scss";
 
 const PostInteractions = ({
   post,
@@ -9,22 +11,27 @@ const PostInteractions = ({
   handleVote,
   commentCount,
   votesCount,
-  hasVoted,
 }) => {
-  // Function to handle share functionality
+  // Function to handle share or copy link
   const handleShare = () => {
+    const shareURL = window.location.href; // Use current page URL
     if (navigator.share) {
       navigator
         .share({
           title: post.title,
           text: post.body,
-          url: window.location.href, // You can customize the URL you want to share
+          url: shareURL,
         })
         .then(() => console.log("Shared successfully"))
         .catch((error) => console.error("Error sharing:", error));
     } else {
-      // Fallback for browsers that do not support the share API
-      alert("Your browser does not support the share feature.");
+      // Fallback: Copy to clipboard
+      navigator.clipboard
+        .writeText(shareURL)
+        .then(() => alert("Link copied to clipboard!"))
+        .catch((error) =>
+          console.error("Failed to copy the link to clipboard:", error)
+        );
     }
   };
 
@@ -34,24 +41,18 @@ const PostInteractions = ({
         className={`vote-button upvote ${
           userVote === "upvote" ? "active" : ""
         }`}
-        onClick={() => handleVote("upvote")} // Trigger handleVote with 'upvote' voteType
+        onClick={() => handleVote("upvote")}
       >
-        <BiUpvote />
+        {userVote === "upvote" ? <FaArrowUp /> : <BiUpvote />}
       </button>
 
-      {/* Vote Count */}
-      <span className="vote-count">
-        {/* Calculate the total vote count */}
-        {votesCount}
-      </span>
+      <span className="vote-count">{votesCount}</span>
 
-      {/* Comment Button */}
       <button className="vote-button comment">
         <FaRegCommentAlt />
         <span className="comment-count">{commentCount}</span>
       </button>
 
-      {/* Share Button */}
       <button className="vote-button share" onClick={handleShare}>
         <RiShareForwardLine />
       </button>

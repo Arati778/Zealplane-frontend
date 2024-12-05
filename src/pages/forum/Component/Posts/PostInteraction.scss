@@ -1,0 +1,55 @@
+.post-votes {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Reduced gap between buttons */
+    margin-bottom: 20px;
+  
+    .vote-button {
+      background: #ffffff; /* Default white background for unhovered state */
+      border: 1px solid #d7dadc; /* Subtle border for default state */
+      color: #6c757d; /* Neutral gray color for icons and text */
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 8px 12px; /* Adjusted padding for compact design */
+      border-radius: 8px; /* Added rounded corners */
+      transition: all 0.2s ease-in-out;
+  
+      &:hover {
+        background-color: rgba(255, 69, 0, 0.2); /* Light orange background for hover */
+        color: #ff4500; /* Bright orange for icons and text on hover */
+        border-color: #ff4500; /* Orange border on hover */
+      }
+  
+      &.upvote {
+        &.active {
+          background-color: rgba(255, 69, 0, 0.2); /* Orange background for active */
+          color: #ff4500; /* Bright orange text/icon for active state */
+          border-color: #ff4500; /* Border for active state */
+        }
+      }
+  
+      &.comment {
+        .comment-count {
+          font-size: 14px; /* Slightly smaller font for counts */
+          color: inherit; /* Inherit color for hover and active state */
+        }
+      }
+  
+      &.share {
+        /* Share button styling remains consistent */
+      }
+    }
+  
+    .vote-count {
+      font-size: 18px; /* Slightly smaller font for consistency */
+      font-weight: bold;
+      color: #6c757d; /* Neutral gray for vote count */
+      padding: 0 5px;
+      margin: 0 8px; /* Slightly reduced margin */
+    }
+  }
+  

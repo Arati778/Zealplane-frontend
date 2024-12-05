@@ -1,33 +1,61 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "./postdetail.scss";
 import Header from "./Component/Header";
 import PostInfo from "./Component/Posts/PostInfo";
 import PostInteractions from "./Component/Posts/PostInteract";
 import CommentsSection from "./Component/Posts/CommentsSection";
-import Sidebar from "./Component/Sidebar"; // Import Sidebar
+import Sidebar from "./Component/Sidebar";
 import Spinner from "../../components/spinner/Spinner";
-import { toast } from "react-toastify"; // Assuming you are using react-toastify
+import axiosInstance from "../../Auth/Axios";
+import { jwtDecode } from "jwt-decode";
 
 const PostDetail = () => {
   const { id } = useParams(); // Get the post ID from the URL
+  const navigate = useNavigate(); // Initialize navigate for redirection
   const [post, setPost] = useState(null); // State to store the post data
   const [comments, setComments] = useState([]); // State to store comments
   const [userVote, setUserVote] = useState(null); // Track if user upvoted or downvoted
   const [status, setStatus] = useState(null);
+  const [hasVoted, setHasVoted] = useState(null);
+  const token = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token"); // Retrieve the token from local storage
+  const getCurrentUserId = () => {
+    const token = localStorage.getItem("token");
+    try {
+      const decodedToken = jwtDecode(token);
 
-  // Function to get the current logged-in user's ID
-  const getUserId = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    return user ? user.uniqueId : null; // Assuming you store the user object with uniqueId in localStorage
+      // Assuming the uniqueId is stored in the token as "uniqueId"
+      const currentUserId = decodedToken.uniqueId;
+      return currentUserId;
+    } catch (error) {
+      return null;
+    }
   };
 
-  const currentUserId = getUserId();
+  const currentUserId = getCurrentUserId();
+  console.log("Current User ID:", currentUserId);
 
-  // Fetch the post data from the backend when the component mounts
+  // Define fetchUserVote outside useEffect
+  const fetchUserVote = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `http://localhost:5000/api/posts/${id}/vote`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("User has interacted:", res.data.hasVoted);
+      setHasVoted(res.data.hasVoted);
+
+      if (res.data.hasVoted) {
+        setUserVote(res.data.voteValue > 0 ? "upvote" : "downvote");
+      }
+    } catch (error) {
+      console.error("Error fetching user vote:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -35,83 +63,103 @@ const PostDetail = () => {
           `http://localhost:5000/api/posts/${id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the request
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        console.log("response of post is", response.data.post);
+        console.log("post is", response.data);
 
-        // Initialize post, comments, and userVote state
         setPost({
           ...response.data.post,
-          votes: response.data.post.votes || [], // Ensure votes is an array
+          votes: response.data.post.votes || [],
         });
         setStatus(response.data.status);
-        setComments(response.data.post.comments || []); // Ensure comments is an array
-        setUserVote(response.data.post.votes || []); // Initialize user vote
-        console.log("user votes are", userVote);
+        setComments(response.data.post.comments || []);
       } catch (error) {
         console.error("Error fetching post:", error);
+        toast.error("Failed to fetch post details!");
       }
     };
 
     fetchPost();
+    fetchUserVote(); // Call fetchUserVote from within useEffect
   }, [id, token]);
 
   const handleVote = async (voteType) => {
     try {
-      if (voteType !== "upvote") {
-        console.error("Invalid vote type"); // Only allow upvote
-        return;
-      }
+      const voteValue = voteType === "upvote" ? 1 : -1;
 
-      const voteValue = 1; // Set vote value to 1 for upvote
+      console.log("voteType:", voteType);
+      console.log("voteValue:", voteValue);
 
-      // Update vote on the backend
-      const res = await axios.put(
-        `http://localhost:5000/api/posts/votes/${id}`,
-        { voteType: voteValue }, // Send voteType as 1 for upvote
+      // Check if the user has already voted
+      const checkUserVoteResponse = await axios.get(
+        `http://localhost:5000/api/posts/${id}/vote`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("votes after post is", res);
+      const { hasVoted, voteValue: userVoteValue } = checkUserVoteResponse.data;
 
-      // Update votes state
-      const updatedVotes = [...post.votes];
-      const existingVoteIndex = updatedVotes.findIndex(
-        (vote) => vote.uniqueId === currentUserId // Use the currentUserId from localStorage
-      );
+      console.log("Has user voted:", hasVoted);
+      console.log("User's current vote value:", userVoteValue);
 
-      if (existingVoteIndex !== -1) {
-        // User has already voted
-        if (updatedVotes[existingVoteIndex].voteValue === voteValue) {
-          // Undo vote (remove the vote)
-          updatedVotes.splice(existingVoteIndex, 1);
-          setUserVote(null);
-        } else {
-          // Change vote to upvote
-          updatedVotes[existingVoteIndex].voteValue = voteValue;
-          setUserVote("upvote");
-        }
+      // Update the UI based on the current state
+      if (hasVoted && userVoteValue === voteValue) {
+        // User is toggling off their vote
+        setUserVote(null); // Clear the user's vote state
+        setPost((prevPost) => ({
+          ...prevPost,
+          votes: prevPost.votes.filter(
+            (vote) => vote.uniqueId !== currentUserId
+          ),
+          votesCount: prevPost.votesCount - 1, // Decrement count
+        }));
       } else {
-        // New vote
-        updatedVotes.push({
-          uniqueId: currentUserId, // Use the currentUserId from localStorage
-          voteValue: voteValue,
-          timestamp: new Date(),
+        // User is either voting for the first time or changing their vote
+        setUserVote(voteType); // Update vote state
+        setPost((prevPost) => {
+          const updatedVotes = prevPost.votes || [];
+          const existingVoteIndex = updatedVotes.findIndex(
+            (vote) => vote.uniqueId === currentUserId
+          );
+
+          if (existingVoteIndex >= 0) {
+            // Update existing vote
+            updatedVotes[existingVoteIndex].value = voteValue;
+          } else {
+            // Add a new vote
+            updatedVotes.push({ uniqueId: currentUserId, value: voteValue });
+          }
+
+          return {
+            ...prevPost,
+            votes: updatedVotes,
+            votesCount:
+              prevPost.votesCount +
+              (hasVoted ? voteValue - userVoteValue : voteValue), // Adjust count
+          };
         });
-        setUserVote("upvote");
       }
 
-      setPost((prevPost) => ({ ...prevPost, votes: updatedVotes }));
+      // Sync with backend (Update vote on the server)
+      const res = await axios.put(
+        `http://localhost:5000/api/posts/votes/${id}`,
+        { voteType: voteValue },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("Response from backend:", res.data);
+
+      toast.success("Vote updated successfully!");
     } catch (error) {
       console.error("Error voting on post:", error);
+      toast.error("An error occurred while voting.");
     }
   };
 
   const handleEditPost = async (updatedData) => {
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `http://localhost:5000/api/posts/${post._id}`,
         updatedData,
         {
@@ -120,17 +168,38 @@ const PostDetail = () => {
           },
         }
       );
+
       toast.success("Post updated successfully!");
-      setPost(response.data.updatedPost); // Update your post state with the new data
+      setPost(response.data.updatedPost);
     } catch (error) {
       console.error("Error updating post:", error);
       toast.error("Failed to update the post!");
     }
   };
 
-  if (!post) return <Spinner />; // Show loading state while data is being fetched
+  const handleDeletePost = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
 
-  const votesCount = post.votes ? post.votes.length : 0; // Count the number of votes
+    if (!confirmDelete) return;
+
+    try {
+      await axiosInstance.delete(`http://localhost:5000/api/posts/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Post deleted successfully!");
+      navigate("/forum");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete the post!");
+    }
+  };
+
+  if (!post) return <Spinner />;
+
+  const votesCount = post.votes ? post.votes.length : 0;
 
   return (
     <div className="post">
@@ -144,8 +213,8 @@ const PostDetail = () => {
           <PostInfo
             post={post}
             status={status}
-            OnEdit={handleEditPost} // Pass the handleEditPost function to PostInfo
             onEdit={handleEditPost}
+            onDelete={handleDeletePost}
           />
 
           <PostInteractions
@@ -153,7 +222,8 @@ const PostDetail = () => {
             userVote={userVote}
             handleVote={handleVote}
             commentCount={comments.length}
-            votesCount={votesCount} // Pass votesCount to the PostInteractions component
+            votesCount={votesCount}
+            hasVoted={hasVoted}
           />
 
           <CommentsSection

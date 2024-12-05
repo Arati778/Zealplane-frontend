@@ -200,7 +200,6 @@ const ProjectModal = ({ open, onClose, onSubmit }) => {
           required
           error={!!errors.description}
           helperText={errors.description}
-          style={{ color: "#fff" }}
           sx={{
             marginBottom: 2,
             input: { color: "#fff" }, // White text color for input

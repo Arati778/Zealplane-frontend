@@ -54,6 +54,15 @@ const EditPostModal = ({ post, onClose, onEdit }) => {
               required
             />
           </div>
+          {/* Render HTML from Body */}
+          {/* <div className="rendered-body">
+            <p
+              dangerouslySetInnerHTML={{
+                __html: formData.body || "No content available",
+              }}
+            ></p>
+          </div> */}
+
           <div className="form-group">
             <label>Subreddit</label>
             <input
